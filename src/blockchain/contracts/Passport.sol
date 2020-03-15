@@ -8,7 +8,7 @@ contract Passport is ERC721Full, ERC721Mintable {
     address internal _owner;
 
     struct Country {
-        bool isVerifiedCountry; 
+        bool isVerifiedCountry;
         string countryCode;
     }
 
@@ -22,7 +22,8 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     struct PassportToken {
         bool isActive;
-        TravelAction[] travelRecord;
+        mapping(uint256 => TravelAction[]) travelRecord;
+        uint256 travelRecordLength;
         address issuingCountry;
     }
 
@@ -33,14 +34,17 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     PassportToken[] internal passportTokenList;
 
-    function createPassport(string memory UUID) public onlyMinterCountry() {
+    constructor() ERC721Full("Passport", "PASS") public {
+        _owner = msg.sender;
+    }
+
+    function createPassport(string memory UUID) public onlyVerifiedCountry() {
         require(passportUUIDMapping[UUID] != 0, "[ERROR] A passport with this UUID has already been created");
 
-        PassportToken memory _newPassport = PassportToken(
-            true,
-            TravelAction[],
-            msg.sender
-        );
+        PassportToken memory _newPassport;
+        _newPassport.isActive = true;
+        _newPassport.travelRecordLength = 0;
+        _newPassport.issuingCountry = msg.sender;
 
         uint256 _passportId = passportTokenList.push(_newPassport);
         passportUUIDMapping[UUID] = _passportId;
@@ -48,34 +52,27 @@ contract Passport is ERC721Full, ERC721Mintable {
         // consider emitting here
     }
 
-    function freezePassport(string UUID) public onlyHomeCountry(UUID) {
-        passportTokenList[UUID].frozenStatus = true;
+    function freezePassport(string memory UUID) public onlyIssuingCountry(UUID) {
+        passportTokenList[passportUUIDMapping[UUID]].isActive = false;
     }
 
     
-    function addNewMinterCountry(string uuid, address country, string countryName, string countryCode) public onlyOwner() {
-        Country memory newCountry = Country(
+    function addNewVerifiedCountry(address country, string memory countryCode) public onlyOwner() {
+        countryList[country] = Country(
             true,
-            countryName,
             countryCode
         );
     }
     
-    function addTravelHistory(string UUID) public onlyOwnerCountry(UUID) {
+    function addTravelHistory(string memory UUID) public onlyOwnerCountry(UUID) {
         
     }
 
-    function viewTravelHistory() public view onlyOwnerCountry(UUID) returns(TravelAction[]) {
+    // function viewTravelHistory(string memory UUID) public view onlyOwnerCountry(UUID) returns(TravelAction[] memory) {
 
-    }
-
-    function _mint() {
-
-    }
-
-    function viewMinterCountry(Address address) public view returns string {
-        Country targetedCountry = minterCountryAddressMapping(address);
-        return targetedCountry.country;
+    // }
+    function viewVerifiedCountry(address countryAddress) public view returns (string memory) {
+        return countryList[countryAddress].countryCode;
     }
     
 
@@ -85,34 +82,34 @@ contract Passport is ERC721Full, ERC721Mintable {
         _;
     }
 
-    modifier onlyMinterCountry() {
+    modifier onlyVerifiedCountry() {
         require(
-            minterCountryAddressMapping[msg.sender].isMinter,
-            "[INVALID PERMISSION] Minter Country Required"
+            countryList[msg.sender].isVerifiedCountry,
+            "[INVALID PERMISSION] Verified Country Required"
         );
         _;
     }
 
-    modifier onlyApproved(string UUID) {
+    modifier onlyApproved(string memory UUID) {
         require(
-            getApproved(passportTokenIdMapping[UUID]) == msg.sender,
+            getApproved(passportUUIDMapping[UUID]) == msg.sender,
             "[INVALID PERMISSION] Approved Sender Required"
         );
         _;
     }
 
-    modifier onlyHomeCountry(string UUID) {
+    modifier onlyIssuingCountry(string memory UUID) {
         require(
-            passportTokenList[passportTokenIdMapping[UUID]].homeCountry ==
+            passportTokenList[passportUUIDMapping[UUID]].issuingCountry ==
                 msg.sender,
-            "[INVALID PERMISSION] Passport Token Home Country Required"
+            "[INVALID PERMISSION] Passport Token Issuing Country Required"
         );
         _;
     }
 
-    modifier onlyOwnerCountry(string UUID) {
+    modifier onlyOwnerCountry(string memory UUID) {
         require(
-            ownerOf(passportTokenIdMapping[UUID]) == msg.sender,
+            ownerOf(passportUUIDMapping[UUID]) == msg.sender,
             "[INVALID PERMISSION] Passport Token Owner Required"
         );
         _;
