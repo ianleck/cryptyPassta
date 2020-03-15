@@ -5,13 +5,11 @@ import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
 
 contract Passport is ERC721Full, ERC721Mintable {
 
-    //contract owner
     address internal _owner;
 
     struct Country {
-        bool isMinter; 
-        string country;
-        string iso3166Code;
+        bool isVerifiedCountry; 
+        string countryCode;
     }
 
     enum Action {Enter, Exit}
@@ -19,48 +17,35 @@ contract Passport is ERC721Full, ERC721Mintable {
     struct TravelAction {
         address destination;
         Action action;
-        uint256 date;
+        uint256 datetime;
     }
 
     struct PassportToken {
-        // defaults to false
-        bool isCreated;
-        // nationality of passport owner
-        string nationality;
-        // frozen status
-        bool frozenStatus;
-        //travel record list
+        bool isActive;
         TravelAction[] travelRecord;
-        //home country
-        address homeCountry;
+        address issuingCountry;
     }
 
-    //mapping of address of minter country to country
-    mapping(address => Country) internal minterCountryAddressMapping;
+    mapping(address => Country) internal countryList;
 
-    //mapping of passport token uuid to passport token array id
-    mapping(string => uint256) internal passportTokenIdMapping;
+    //Eg; SG123 to index 1 of passportTokenList
+    mapping(string => uint256) internal passportUUIDMapping;
 
-    //array of passport token
     PassportToken[] internal passportTokenList;
 
-    //UUID Prefix with Country code
-    function createPassport(string UUID, string nationality) public onlyMinterCountry() {
-        require(passportTokenIdMapping[UUID] != 0, "UUID exist")
-        require(nationality == minters[msg.sender].country, "Error: Nationality Mismatch")
+    function createPassport(string memory UUID) public onlyMinterCountry() {
+        require(passportUUIDMapping[UUID] != 0, "[ERROR] A passport with this UUID has already been created");
 
         PassportToken memory _newPassport = PassportToken(
             true,
-            nationality,
-            false,
             TravelAction[],
             msg.sender
         );
 
         uint256 _passportId = passportTokenList.push(_newPassport);
-        passportTokenIdMapping[UUID] = _passportId;
+        passportUUIDMapping[UUID] = _passportId;
         _mint(msg.sender, _passportId);
-
+        // consider emitting here
     }
 
     function freezePassport(string UUID) public onlyHomeCountry(UUID) {
@@ -77,10 +62,14 @@ contract Passport is ERC721Full, ERC721Mintable {
     }
     
     function addTravelHistory(string UUID) public onlyOwnerCountry(UUID) {
-        // bump
+        
     }
 
     function viewTravelHistory() public view onlyOwnerCountry(UUID) returns(TravelAction[]) {
+
+    }
+
+    function _mint() {
 
     }
 
