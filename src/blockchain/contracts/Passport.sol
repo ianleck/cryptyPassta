@@ -77,7 +77,7 @@ contract Passport is ERC721Full, ERC721Mintable {
     }
     
     function addTravelHistory(string UUID) public onlyOwnerCountry(UUID) {
-
+        // bump
     }
 
     function viewTravelHistory() public view onlyOwnerCountry(UUID) returns(TravelAction[]) {
