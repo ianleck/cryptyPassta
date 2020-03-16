@@ -6,15 +6,15 @@ module.exports = deployer => {
     .then(() => {
       return deployer.deploy(Passport);
     })
-    .then(PassportInstance => {
+    .then(Passport => {
       console.log(
-        'Passport Instance deployed at address = ' + PassportInstance.address
+        'Passport Instance deployed at address = ' + Passport.address
       );
-      return deployer.deploy(Global, PassportInstance.address);
+      return deployer.deploy(Global, Passport.address);
     })
-    .then(GlobalInstance => {
+    .then(Global => {
       console.log(
-        'Global Instance deployed at address = ' + GlobalInstance.address
+        'Global Instance deployed at address = ' + Global.address
       );
     });
 };

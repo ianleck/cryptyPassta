@@ -50,6 +50,7 @@ contract Global {
     //Postcondition: Freeze trasnfer record and add new travel record
     function acceptTraveler(string UUID, uint256 date) public onlyWorker() {
 
+
         transferAuthority[UUID].isActive = false;
 
         passport.addTravelHistory(UUID, Entry, block.timestamp);
