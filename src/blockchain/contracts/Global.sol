@@ -16,66 +16,54 @@ contract Global {
 
     struct Worker {
         string name;
-        const string nationality;
+        string nationality;
         bool isActive;
     }
 
 
     function addNewCountry() public onlyGlobalOwner() {}
 
-    function addNewWorker(string name) public onlyMinter() {
-        string nationality = passport.viewMinterCountry(msg.sender);
-        Worker memory newWorker = Worker(name, nationality, true);
+    function addNewWorker(string memory name) public onlyMinter() {
+        // string memory nationality = passport.viewMinterCountry(msg.sender);
+        // Worker memory newWorker = Worker(name, nationality, true);
     }
 
-    function updateWorkerStatus(address workerAddress, string name, bool status) public onlyMinter() {
-        require(passport.viewMinterCountry(msg.sender) == worker[workerAddress].nationality, "Cannot update status of worker from another country");
-        worker[workerAddress].name = name ;
-        worker[workerAddress].isActive = status ;
+    function updateWorkerStatus(address workerAddress, string memory name, bool status) public onlyMinter() {
+        // require(passport.viewMinterCountry(msg.sender) == worker[workerAddress].nationality, "Cannot update status of worker from another country");
+        worker[workerAddress].name = name;
+        worker[workerAddress].isActive = status;
     }
 
-    function acceptTraveler(string UUID, uint256 date) public onlyWorker() {
-       passport.addTravelHistory(worker[msg.sender].nationality, Enter, date);
-       transferAuthority[UUID].isPending = false ; 
+    function acceptTraveler(string memory UUID, uint256 date) public onlyWorker() {
+    //    passport.addTravelHistory(worker[msg.sender].nationality, "Enter", date);
+       transferAuthority[UUID].isPending = false;
     }
 
 
-    function rejectTraveler(string UUID) public onlyWorker() {
+    function rejectTraveler(string memory UUID) public onlyWorker() {
         
     }
 
-    function retrievePassportDetails(string UUID) public onlyWorker() {
+    function retrievePassportDetails(string memory UUID) public onlyWorker() {
 
 
     }
 
     modifier onlyMinter() {
-      require()
+        require(true);
+        _;
     }
 
-    modifier onlyWorker() {}
+    modifier onlyWorker() {
+        require(true);
+        _;
+    }
 
     modifier onlyGlobalOwner() {
         require(
             msg.sender == _globalOwner,
             "You do not have the authority to perform this action"
         );
-    }
-}
-    function rejectTraveler() public onlyWorker() {}
-
-    function retrievePassportDetails() public onlyWorker() {}
-
-    modifier onlyMinter() {
-      require()
-    }
-
-    modifier onlyWorker() {}
-
-    modifier onlyGlobalOwner() {
-        require(
-            msg.sender == _globalOwner,
-            "You do not have the authority to perform this action"
-        );
+        _;
     }
 }
