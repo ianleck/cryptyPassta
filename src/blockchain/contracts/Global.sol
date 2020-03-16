@@ -2,13 +2,16 @@ pragma solidity ^0.5.0;
 import "./Passport.sol";
 
 contract Global {
-    address public _globalOwner;
-    Passport passport;
+    address public _globalOwner = msg.sender;
+    Passport passport;    
 
-    mapping(address => Worker) worker;
-    mapping(string => TransferRecords) transferAuthority;
+    //Maps address of worker accounts
+    mapping(address => Worker) workers;
 
-    struct TransferRecords {
+    //Maps UUID of passports to trasnfer Records
+    mapping(string => TransferRecord) transferAuthority;
+
+    struct TransferRecord {
         address prevOwner;
         address[] newOwner;
         bool isPending;
@@ -16,54 +19,64 @@ contract Global {
 
     struct Worker {
         string name;
-        string nationality;
+        const address nationality; //Linked to Country minter
         bool isActive;
     }
 
-
-    function addNewCountry() public onlyGlobalOwner() {}
-
-    function addNewWorker(string memory name) public onlyMinter() {
-        // string memory nationality = passport.viewMinterCountry(msg.sender);
-        // Worker memory newWorker = Worker(name, nationality, true);
+    function addNewWorker(string name, address workerAddress) public onlyMinter() {
+        Worker memory newWorker = Worker(name, msg.sender, true);
+        workers[workerAddress] = newWorker;
     }
 
-    function updateWorkerStatus(address workerAddress, string memory name, bool status) public onlyMinter() {
-        // require(passport.viewMinterCountry(msg.sender) == worker[workerAddress].nationality, "Cannot update status of worker from another country");
+    function updateWorkerStatus(address workerAddress, string name, bool status) public onlyMinter() {
+        require(workers[workerAddress].nationality == msg.sender, "Cannot update status of worker from another country");
+        
         worker[workerAddress].name = name;
         worker[workerAddress].isActive = status;
     }
 
-    function acceptTraveler(string memory UUID, uint256 date) public onlyWorker() {
-    //    passport.addTravelHistory(worker[msg.sender].nationality, "Enter", date);
-       transferAuthority[UUID].isPending = false;
-    }
-
-
-    function rejectTraveler(string memory UUID) public onlyWorker() {
+    //Precondition: Date is in UNIX epoch seconds format
+    //PostCondition: Create a transfer Record, Add new travel record to passport
+    function travelerDeparture(string UUID, uint256 date, address[] travelList) public onlyWorker(){
         
+        address[] travels = travelList;
+        TransferRecord memory newTransfer = TransferRecord(msg.sender, travels, true);
+        transferAuthority[UUID] = newTransfer;
+
+        passport.addTravelHistory(UUID, Exit, block.timestamp);
     }
 
-    function retrievePassportDetails(string memory UUID) public onlyWorker() {
+    //Precondition: Date is in UNIX epoch seconds format
+    //Postcondition: Freeze trasnfer record and add new travel record
+    function acceptTraveler(string UUID, uint256 date) public onlyWorker() {
 
+
+        transferAuthority[UUID].isActive = false;
+
+        passport.addTravelHistory(UUID, Entry, block.timestamp);
 
     }
+
+    //Precondition: transferRequest must exist
+    //PostCondition: Flip locations on transfer request
+    function rejectTraveler(string UUID) public onlyWorker() {
+
+        Address toLoc = transferAuthority[UUID].prevOwner;
+        transferAuthority[UUID].prevOwner = workers[msg.sender].nationality;
+        Address[] newList = [toLoc];
+        transferAuthority[UUID].newOwner = newList;
+
+    }
+
 
     modifier onlyMinter() {
-        require(true);
-        _;
+      require(passport.checkOwner(msg.sender), "[Error] This is a minter only action")
+      _;
     }
 
     modifier onlyWorker() {
-        require(true);
+        require(workers[msg.sender].isActive == true, "[Error] This is an active worker only action")
         _;
     }
 
-    modifier onlyGlobalOwner() {
-        require(
-            msg.sender == _globalOwner,
-            "You do not have the authority to perform this action"
-        );
-        _;
-    }
 }
