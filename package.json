@@ -4,7 +4,7 @@
   "description": "",
   "main": "truffle-config.js",
   "scripts": {
-    "build": "ganache-cli -p 8545",
+    "build": "ganache-cli -p 9418",
     "migrate": "cd ./src/blockchain && truffle migrate",
     "test": "cd ./src/blockchain && truffle test"
   },
