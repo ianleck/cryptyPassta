@@ -2,14 +2,10 @@ pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
-import "@openzeppelin/contracts/access/roles/MinterRole.sol";
 
 contract Passport is ERC721Full, ERC721Mintable {
-    address internal _owner;
 
-    constructor() public ERC721Full("Passport", "PASS") {
-        _owner = msg.sender;
-    }
+    address internal _owner;
 
     struct Country {
         bool isVerifiedCountry;
@@ -38,30 +34,12 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     PassportToken[] internal passportTokenList;
 
-    event countryRegistrationSuccess(string countryCode);
-    event passportCreationSuccess(string UUID);
-    event retrievePassport(TravelAction[] travelRecords);
-    /** Add new country - to list + as minter
- *  Create passport
- *  All passports are owned by the country right? Yup
- *  Indiv user is just read only?
- *  They will read only through the UI that we provide right? Yup the country that they are in will own the passport
- */
-
-    function registerCountry(address country, string memory countryCode)
-        public
-        onlyOwner() // Need to change to admin, so there's list of admin instead of just owner. Refer to WhitelistAdminRole.sol
-    {
-        countryList[country] = Country(true, countryCode);
-        addMinter(country);
-        emit countryRegistrationSuccess(countryCode);
+    constructor() ERC721Full("Passport", "PASS") public {
+        _owner = msg.sender;
     }
 
     function createPassport(string memory UUID) public onlyVerifiedCountry() {
-        require(
-            passportUUIDMapping[UUID] != 0,
-            "[ERROR] A passport with this UUID has already been created"
-        );
+        require(passportUUIDMapping[UUID] != 0, "[ERROR] A passport with this UUID has already been created");
 
         PassportToken memory _newPassport;
         _newPassport.isActive = true;
@@ -71,45 +49,32 @@ contract Passport is ERC721Full, ERC721Mintable {
         uint256 _passportId = passportTokenList.push(_newPassport);
         passportUUIDMapping[UUID] = _passportId;
         _mint(msg.sender, _passportId);
-        emit passportCreationSuccess(UUID);
+        // consider emitting here
     }
 
-    function viewPassport(string memory UUID) public {
-        require(
-            passportUUIDMapping[UUID] != 0,
-            "[ERROR] No such passport has been created"
-        );
-        PassportToken memory passportToView = passportTokenList[passportUUIDMapping[UUID]];
-        emit retrievePassport(passportToView.travelRecord);
-    }
-
-    function freezePassport(string memory UUID)
-        public
-        onlyIssuingCountry(UUID)
-    {
+    function freezePassport(string memory UUID) public onlyIssuingCountry(UUID) {
         passportTokenList[passportUUIDMapping[UUID]].isActive = false;
     }
 
-    function addTravelHistory(
-        string memory UUID,
-        Action action,
-        uint256 timestamp
-    ) public onlyOwnerCountry(UUID) {}
+    
+    function addNewVerifiedCountry(address country, string memory countryCode) public onlyOwner() {
+        countryList[country] = Country(
+            true,
+            countryCode
+        );
+    }
+    
+    function addTravelHistory(string memory UUID, Action action, uint256 timestamp) public onlyOwnerCountry(UUID) {
+        
+    }
 
     // function viewTravelHistory(string memory UUID) public view onlyOwnerCountry(UUID) returns(TravelAction[] memory) {
 
     // }
-    function viewRegisteredCountry(address countryAddress)
-        public
-        view
-        returns (string memory)
-    {
-        require(
-            countryList[countryAddress].isVerifiedCountry == true,
-            "[ERROR] No such country has been registered"
-        );
+    function viewVerifiedCountry(address countryAddress) public view returns (string memory) {
         return countryList[countryAddress].countryCode;
     }
+    
 
     //access modifier functions
     modifier onlyOwner() {
