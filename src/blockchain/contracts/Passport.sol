@@ -53,7 +53,8 @@ contract Passport is ERC721Full, ERC721Mintable {
     }
 
     function freezePassport(string memory UUID) public onlyIssuingCountry(UUID) {
-        passportTokenList[passportUUIDMapping[UUID]].isActive = false;
+        require(passportTokenList[passportUUIDMapping[UUID] - 1].isActive == true, "[ERROR] The passport with this UUID must be active");
+        passportTokenList[passportUUIDMapping[UUID] - 1].isActive = false;
     }
 
     
