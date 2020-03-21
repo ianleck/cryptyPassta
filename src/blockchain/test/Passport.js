@@ -58,3 +58,4 @@ contract('Passport', accounts => {
     }
   });
 });
+
