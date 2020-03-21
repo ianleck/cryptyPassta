@@ -66,12 +66,12 @@ contract Global {
 
     }
 
-    function checkActiveWorker(Address address) public onlyOwner() returns (bool){
-        returns workers[address].isActive;
+    function checkActiveWorker(address workeraddress) public onlyOwner() returns (bool){
+        return workers[workeraddress].isActive;
     }
 
-    function checkActiveTransfer(string UUID) public onlyOwner() returns (bool){
-        returns transferAuthority[UUID].isPending;
+    function checkActiveTransfer(string memory UUID) public onlyOwner() returns (bool){
+        return transferAuthority[UUID].isPending;
     }
 
     modifier onlyMinter() {
