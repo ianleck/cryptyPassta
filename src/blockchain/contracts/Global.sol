@@ -36,7 +36,7 @@ contract Global {
 
     //Precondition: Date is in UNIX epoch seconds format
     //PostCondition: Create a transfer Record, Add new travel record to passport
-    function travelerDeparture(string memory UUID, address[] memory travelList) public onlyWorker() {
+    function travelerDeparture(string memory UUID, uint256 date, address[] memory travelList) public onlyWorker() {
 
         address[] memory travels = travelList;
         TransferRecord memory newTransfer = TransferRecord(msg.sender, travels, true);
@@ -47,7 +47,8 @@ contract Global {
 
     //Precondition: Date is in UNIX epoch seconds format
     //Postcondition: Freeze trasnfer record and add new travel record
-    function acceptTraveler(string memory UUID) public onlyWorker() {
+    function acceptTraveler(string memory UUID, uint256 date) public onlyWorker() {
+
 
         transferAuthority[UUID].isPending = false;
 
@@ -66,13 +67,6 @@ contract Global {
 
     }
 
-    function checkActiveWorker(address workeraddress) public onlyOwner() returns (bool){
-        return workers[workeraddress].isActive;
-    }
-
-    function checkActiveTransfer(string memory UUID) public onlyOwner() returns (bool){
-        return transferAuthority[UUID].isPending;
-    }
 
     modifier onlyMinter() {
     //   require(passport.checkOwner(msg.sender), "[Error] This is a minter only action");
@@ -85,8 +79,4 @@ contract Global {
         _;
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == _globalOwner, "[Error] This is platform owner action");
-        _;
-    }
 }

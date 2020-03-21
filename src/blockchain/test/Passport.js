@@ -16,4 +16,3 @@ contract('Passport', accounts => {
     assert.notEqual(address, undefined);
   });
 });
-
