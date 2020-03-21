@@ -40,7 +40,7 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     event countryRegistrationSuccess(string countryCode);
     event passportCreationSuccess(string UUID);
-    event retrievePassport(TravelAction[] travelRecords);
+    // event retrievePassport(TravelAction[] travelRecords);
     /** Add new country - to list + as minter
  *  Create passport
  *  All passports are owned by the country right? Yup
@@ -80,7 +80,7 @@ contract Passport is ERC721Full, ERC721Mintable {
             "[ERROR] No such passport has been created"
         );
         PassportToken memory passportToView = passportTokenList[passportUUIDMapping[UUID]];
-        emit retrievePassport(passportToView.travelRecord);
+        // emit retrievePassport(passportToView.travelRecord);
     }
 
     function freezePassport(string memory UUID)
