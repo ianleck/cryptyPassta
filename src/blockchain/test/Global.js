@@ -10,7 +10,7 @@ contract('Passport', accounts => {
   let workerA = accounts[4];
   let workerB = accounts[5];
   let passportUUID1 = 'A123';
-  let passportUUID1 = 'B123';
+  let passportUUID2 = 'B123';
 
   before(async () => {
     passportInstance = await Passport.new({
