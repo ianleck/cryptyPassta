@@ -6,7 +6,11 @@
   "scripts": {
     "build": "ganache-cli -p 9418",
     "migrate": "cd ./src/blockchain && truffle migrate",
-    "test": "cd ./src/blockchain && truffle test"
+    "test": "cd ./src/blockchain && truffle test",
+    "start": "concurrently \"cd src/backend && npm run start-dev\" \"cd src/frontEnd/my-app && npm start\"",
+    "install": "concurrently \"cd src/backend && npm install\" \"cd src/frontend/my-app && npm install\"",
+    "install:backend": "cd src/backend && npm install",
+    "install:frontend": "cd src/frontend/my-app && npm install"
   },
   "repository": {
     "type": "git",
@@ -23,5 +27,8 @@
     "ganache-cli": "^6.9.1",
     "truffle": "^5.1.17",
     "truffle-assertions": "^0.9.2"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.2"
   }
 }
