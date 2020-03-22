@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as AuthAPI from '../../webservice/auth';
 import LoginLogo from '../../images/login.svg';
 import { Form, Input, Button, Checkbox, Typography } from 'antd';
+import { useHistory } from 'react-router-dom';
 require('./login.scss');
 
 const { Title } = Typography;
@@ -14,14 +15,16 @@ const tailLayout = {
   wrapperCol: { offset: 0, span: 32 }
 };
 
-function Login() {
+const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const history = useHistory();
 
   const handleLogin = () => {
     AuthAPI.login({ username: username, password: password })
       .then(res => {
         sessionStorage.setItem('session', res.data);
+        history.push('/');
       })
       .catch(err => console.log('Error Occur', err));
   };
@@ -96,6 +99,6 @@ function Login() {
       </div>
     </div>
   );
-}
+};
 
 export default Login;

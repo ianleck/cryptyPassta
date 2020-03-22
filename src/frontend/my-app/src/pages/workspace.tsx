@@ -1,6 +1,9 @@
 import React from 'react';
 import { Layout, Menu, Breadcrumb } from 'antd';
+//import PassportLogo from '../images/passport.svg';
 const { Header, Content, Footer } = Layout;
+
+require('./workspace.scss');
 
 function Workspace() {
   //TODO: Move Styling to SCSS
@@ -14,9 +17,12 @@ function Workspace() {
             height: '31px',
             background: 'rgba(255, 255, 255, 0.2)',
             margin: '16px 24px 16px 0',
-            float: 'left'
+            float: 'left',
+            textAlign: 'center'
           }}
-        ></div>
+        >
+          <h2 style={{ color: 'white' }}>ICON</h2>
+        </div>
         <Menu
           theme="dark"
           mode="horizontal"
@@ -38,7 +44,7 @@ function Workspace() {
           style={{
             background: '#fff',
             padding: '24px',
-            minHeight: '75vh'
+            minHeight: '73vh'
           }}
         >
           Content
