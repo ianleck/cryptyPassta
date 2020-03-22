@@ -110,14 +110,13 @@ contract Passport is ERC721Full, ERC721Mintable {
         );
         return countryList[countryAddress].countryCode;
     }
-
     function checkVerifiedCountry(address countryAddress)
         public
+        view
         returns (bool)
     {
         return countryList[countryAddress].isVerifiedCountry;
     }
-
     //access modifier functions
     modifier onlyOwner() {
         require(msg.sender == _owner, "[INVALID PERMISSION] Owner Required");

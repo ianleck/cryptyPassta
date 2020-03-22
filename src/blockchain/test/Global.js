@@ -2,7 +2,7 @@ const TruffleAssert = require("truffle-assertions");
 const Passport = artifacts.require("./Passport.sol");
 const Global = artifacts.require("./Global.sol");
 
-contract("Global", accounts => {
+contract.only("Global", accounts => {
   let globalInstance;
   let platformOwner = accounts[0];
   let countryAacc = accounts[1];
@@ -15,7 +15,7 @@ contract("Global", accounts => {
   before(async () => {
     passportInstance = await Passport.deployed();
     globalInstance = await Global.deployed();
-    console.log("Global : " + globalInstance.address);
+    //console.log("Global : " + globalInstance.address);
   });
 
   it("Test case 1: Passport.sol deploys successfully", async () => {
@@ -24,7 +24,7 @@ contract("Global", accounts => {
     assert.notEqual(address, "");
     assert.notEqual(address, null);
     assert.notEqual(address, undefined);
-    console.log(passportInstance.address);
+    //console.log(passportInstance.address);
   });
 
   it("Test case 2: Global.sol deploys successfully", async () => {
@@ -33,59 +33,76 @@ contract("Global", accounts => {
     assert.notEqual(address, "");
     assert.notEqual(address, null);
     assert.notEqual(address, undefined);
-    console.log(globalInstance.address);
+    //console.log(globalInstance.address);
   });
 
   it("Test case 3: Set up passports for testing", async () => {
-    await passportInstance.registerCountry(countryAacc, "AAA", {
-      from: platformOwner
-    });
+    const registeredCountryA = await passportInstance.registerCountry(
+      countryAacc,
+      "AAA",
+      {
+        from: platformOwner
+      }
+    );
+    TruffleAssert.eventEmitted(
+      registeredCountryA,
+      "countryRegistrationSuccess"
+    );
 
-    await passportInstance.registerCountry(countryBacc, "BBB", {
-      from: platformOwner
-    });
+    const registeredCountryB = await passportInstance.registerCountry(
+      countryBacc,
+      "BBB",
+      {
+        from: platformOwner
+      }
+    );
+    TruffleAssert.eventEmitted(
+      registeredCountryB,
+      "countryRegistrationSuccess"
+    );
 
     const aPassport = await passportInstance.createPassport(passportUUID1, {
       from: countryAacc
     });
-
     TruffleAssert.eventEmitted(aPassport, "passportCreationSuccess");
 
     const bPassport = await passportInstance.createPassport(passportUUID2, {
       from: countryBacc
     });
-
     TruffleAssert.eventEmitted(bPassport, "passportCreationSuccess");
   });
 
   it("Test case 4: Register New worker under country A and country B", async () => {
-    console.log("A address: " + workerA);
+    //console.log("A address: " + workerA);
+    //console.log(await passportInstance.checkVerifiedCountry(countryAacc));
     let aWorker = await globalInstance.addNewWorker("workerAAA", workerA, {
       from: countryAacc
     });
-
+    //console.log("Country A: " + countryAacc);
+    //console.log("a log: " + aWorker);
     TruffleAssert.eventEmitted(aWorker, "workerRegistered");
 
-    console.log("Here 2");
+    //console.log("Here 2");
     let bWorker = await globalInstance.addNewWorker("workerBBB", workerB, {
       from: countryBacc
     });
+    //console.log("b log: " + bworker);
 
     TruffleAssert.eventEmitted(bWorker, "workerRegistered");
   });
-  /*
+
   it("Test case 5: Send travellers out from both country A and B", async () => {
     //Tourist 1 leaves home country A to Country B and is processed by WorkerA
     try {
       let listforA = [countryBacc];
       globalInstance.travelerDeparture(passportUUID1, listforA, {
-        from: workerA
+        from: countryAacc
       });
 
       let listforB = [countryAacc];
       //Tourist 2 leaves home country B to Country A and is processed by WorkerB
       globalInstance.travelerDeparture(passportUUID2, listforB, {
-        from: workerB
+        from: countryBacc
       });
 
       let tx1 = await globalInstance.checkActiveTransfer(passportUUID1, {
@@ -94,6 +111,7 @@ contract("Global", accounts => {
       let tx2 = await globalInstance.checkActiveTransfer(passportUUID2, {
         from: platformOwner
       });
+
       let tx3 = tx1 && tx2;
 
       //check result
@@ -107,6 +125,7 @@ contract("Global", accounts => {
     }
   });
 
+  /*
   it("Test case 6: Accept Tourist A into Country B", async () => {
     await globalInstance.acceptTraveler(passportUUID1, {
       from: workerB

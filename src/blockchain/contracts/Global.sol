@@ -5,6 +5,10 @@ contract Global {
     address public _globalOwner = msg.sender;
     Passport passport;
 
+    constructor(Passport passportAddress) public {
+        passport = passportAddress;
+    }
+
     //Maps address of worker accounts
     mapping(address => Worker) workers;
 
@@ -12,6 +16,7 @@ contract Global {
     mapping(string => TransferRecord) transferAuthority;
 
     event workerRegistered(string name, address nation, bool isActive);
+    event debug(bool);
 
     struct TransferRecord {
         address prevOwner;
@@ -27,18 +32,25 @@ contract Global {
 
     function addNewWorker(string memory name, address workerAddress)
         public
-        onlyMinter()
+        onlyCountries(msg.sender)
     {
+        //bool test = passport.checkVerifiedCountry(msg.sender);
+        //emit debug(test);
+
         Worker memory newWorker = Worker(name, msg.sender, true);
         workers[workerAddress] = newWorker;
-        emit workerRegistered(name, msg.sender, true);
+        emit workerRegistered(
+            newWorker.name,
+            newWorker.nationality,
+            newWorker.isActive
+        );
     }
 
     function updateWorkerStatus(
         address workerAddress,
         string memory name,
         bool status
-    ) public onlyMinter() {
+    ) public onlyCountries(msg.sender) {
         require(
             workers[workerAddress].nationality == msg.sender,
             "Cannot update status of worker from another country"
@@ -100,12 +112,16 @@ contract Global {
         return transferAuthority[UUID].isPending;
     }
 
-    modifier onlyMinter() {
+    function checkVerifiedCountry(address sender) internal returns (bool) {
+        string memory result = passport.viewRegisteredCountry(sender);
+        return
+            keccak256(abi.encodePacked((result))) !=
+            keccak256(abi.encodePacked(("")));
+    }
+
+    modifier onlyCountries(address sender) {
         //   require(passport.checkOwner(msg.sender), "[Error] This is a minter only action");
-        require(
-            passport.checkVerifiedCountry(msg.sender) == true,
-            "[Error] This is a minter only action"
-        );
+        require(checkVerifiedCountry(sender) == true, "Fail");
         _;
     }
 
