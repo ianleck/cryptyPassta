@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
+  "engines": {
+    "node": ">=10.19.0"
+  },
   "scripts": {
     "build": "ganache-cli -p 9418",
     "migrate": "cd ./src/blockchain && truffle migrate",
