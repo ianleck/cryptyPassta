@@ -11,6 +11,8 @@ contract Global {
     //Maps UUID of passports to trasnfer Records
     mapping(string => TransferRecord) transferAuthority;
 
+    event workerRegistered(string name, address nation, bool isActive);
+
     struct TransferRecord {
         address prevOwner;
         address[] newOwner;
@@ -23,23 +25,40 @@ contract Global {
         bool isActive;
     }
 
-    function addNewWorker(string memory name, address workerAddress) public onlyMinter() {
+    function addNewWorker(string memory name, address workerAddress)
+        public
+        onlyMinter()
+    {
         Worker memory newWorker = Worker(name, msg.sender, true);
         workers[workerAddress] = newWorker;
+        emit workerRegistered(name, msg.sender, true);
     }
 
-    function updateWorkerStatus(address workerAddress, string memory name, bool status) public onlyMinter() {
-        require(workers[workerAddress].nationality == msg.sender, "Cannot update status of worker from another country");
+    function updateWorkerStatus(
+        address workerAddress,
+        string memory name,
+        bool status
+    ) public onlyMinter() {
+        require(
+            workers[workerAddress].nationality == msg.sender,
+            "Cannot update status of worker from another country"
+        );
         workers[workerAddress].name = name;
         workers[workerAddress].isActive = status;
     }
 
     //Precondition: Date is in UNIX epoch seconds format
     //PostCondition: Create a transfer Record, Add new travel record to passport
-    function travelerDeparture(string memory UUID, address[] memory travelList) public onlyWorker() {
-
+    function travelerDeparture(string memory UUID, address[] memory travelList)
+        public
+        onlyWorker()
+    {
         address[] memory travels = travelList;
-        TransferRecord memory newTransfer = TransferRecord(msg.sender, travels, true);
+        TransferRecord memory newTransfer = TransferRecord(
+            msg.sender,
+            travels,
+            true
+        );
         transferAuthority[UUID] = newTransfer;
 
         passport.addTravelHistory(UUID, Passport.Action.Exit, block.timestamp);
@@ -48,7 +67,6 @@ contract Global {
     //Precondition: Date is in UNIX epoch seconds format
     //Postcondition: Freeze trasnfer record and add new travel record
     function acceptTraveler(string memory UUID) public onlyWorker() {
-
         transferAuthority[UUID].isPending = false;
 
         passport.addTravelHistory(UUID, Passport.Action.Enter, block.timestamp);
@@ -58,7 +76,6 @@ contract Global {
     //Precondition: transferRequest must exist
     //PostCondition: Flip locations on transfer request
     function rejectTraveler(string memory UUID) public onlyWorker() {
-
         address toLoc = transferAuthority[UUID].prevOwner;
         transferAuthority[UUID].prevOwner = workers[msg.sender].nationality;
         // address[] memory newList = ;
@@ -66,27 +83,45 @@ contract Global {
 
     }
 
-    function checkActiveWorker(address workeraddress) public onlyOwner() returns (bool){
+    function checkActiveWorker(address workeraddress)
+        public
+        onlyOwner()
+        returns (bool)
+    {
         return workers[workeraddress].isActive;
     }
 
-    function checkActiveTransfer(string memory UUID) public onlyOwner() returns (bool){
+    function checkActiveTransfer(string memory UUID)
+        public
+        view
+        onlyOwner()
+        returns (bool)
+    {
         return transferAuthority[UUID].isPending;
     }
 
     modifier onlyMinter() {
-    //   require(passport.checkOwner(msg.sender), "[Error] This is a minter only action");
-      require(true, "[Error] This is a minter only action");
-      _;
+        //   require(passport.checkOwner(msg.sender), "[Error] This is a minter only action");
+        require(
+            passport.checkVerifiedCountry(msg.sender) == true,
+            "[Error] This is a minter only action"
+        );
+        _;
     }
 
     modifier onlyWorker() {
-        require(workers[msg.sender].isActive == true, "[Error] This is an active worker only action");
+        require(
+            workers[msg.sender].isActive == true,
+            "[Error] This is an active worker only action"
+        );
         _;
     }
 
     modifier onlyOwner() {
-        require(msg.sender == _globalOwner, "[Error] This is platform owner action");
+        require(
+            msg.sender == _globalOwner,
+            "[Error] This is platform owner action"
+        );
         _;
     }
 }
