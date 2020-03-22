@@ -71,8 +71,9 @@ contract Passport is ERC721Full, ERC721Mintable {
         uint256 _passportId = passportTokenList.push(_newPassport);
         passportUUIDMapping[UUID] = _passportId;
         _mint(msg.sender, _passportId);
-        emit passportCreationSuccess(UUID);
+        // consider emitting here
     }
+
 
     function viewPassport(string memory UUID) public {
         require(
@@ -87,7 +88,8 @@ contract Passport is ERC721Full, ERC721Mintable {
         public
         onlyIssuingCountry(UUID)
     {
-        passportTokenList[passportUUIDMapping[UUID]].isActive = false;
+        require(passportTokenList[passportUUIDMapping[UUID] - 1].isActive == true, "[ERROR] The passport with this UUID must be active");
+        passportTokenList[passportUUIDMapping[UUID] - 1].isActive = false;
     }
 
     function addTravelHistory(
