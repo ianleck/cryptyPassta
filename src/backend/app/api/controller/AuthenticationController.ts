@@ -60,7 +60,7 @@ router.post('/createWorker', function(req, res) {
 });
 
 router.get('/login', function(req, res) {
-  login(req.body.username, req.body.password)
+  login(req.query.username, req.query.password)
     .then(result => {
       res
         .status(200)
@@ -76,7 +76,7 @@ router.get('/login', function(req, res) {
 });
 
 router.get('/validateUser', function(req, res) {
-  validateUser(req.body.username, req.headers['authorization'])
+  validateUser(req.query.username, req.headers['authorization'])
     .then(result => {
       res
         .status(200)

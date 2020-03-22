@@ -1,11 +1,7 @@
 import database = require('firebase');
 import { WorkerEntity } from '../model/WorkerEntity';
 
-export interface IPassportDao {
-  findAllWorkers(): Promise<WorkerEntity[]>;
-}
-
-class PassportDao implements IPassportDao {
+class PassportRepository {
   constructor() {}
 
   findAllWorkers(): Promise<WorkerEntity[]> {
