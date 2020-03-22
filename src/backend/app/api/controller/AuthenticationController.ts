@@ -17,78 +17,54 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-router.get('/findAllWorkers', function(req, res) {
-  findAllWorkers()
-    .then(result => {
-      res
-        .status(200)
-        .json(result)
-        .send();
-    })
-    .catch(error => {
-      res.status(400).send();
-    });
+router.get('/findAllWorkers', async (req, res) => {
+  try {
+    const result = await findAllWorkers();
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(400).send();
+  }
 });
 
-router.get('/findWorker', function(req, res) {
-  findWorker(req.query.username)
-    .then(result => {
-      res
-        .status(200)
-        .json(result)
-        .send();
-    })
-    .catch(error => {
-      res.status(400).send();
-    });
+router.get('/findWorker', async (req, res) => {
+  const { username } = req.query;
+  try {
+    const result = await findWorker(username);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(400).send();
+  }
 });
 
-router.post('/createWorker', function(req, res) {
-  createWorker(req.body)
-    .then(result => {
-      res
-        .status(200)
-        .json(result)
-        .send();
-    })
-    .catch(error => {
-      res
-        .status(400)
-        .json(error.message)
-        .send();
-    });
+router.post('/createWorker', async function(req, res) {
+  const worker = req.body;
+  try {
+    const result = await createWorker(worker);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
 
-router.get('/login', function(req, res) {
-  login(req.query.username, req.query.password)
-    .then(result => {
-      res
-        .status(200)
-        .json(result)
-        .send();
-    })
-    .catch(error => {
-      res
-        .status(400)
-        .json(error.message)
-        .send();
-    });
+router.get('/login', async (req, res) => {
+  const { username, password } = req.query;
+  try {
+    const result = await login(username, password);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
 
-router.get('/validateUser', function(req, res) {
-  validateUser(req.query.username, req.headers['authorization'])
-    .then(result => {
-      res
-        .status(200)
-        .json(result)
-        .send();
-    })
-    .catch(error => {
-      res
-        .status(400)
-        .json(error.message)
-        .send();
-    });
+router.get('/validateUser', async (req, res) => {
+  const { username } = req.query;
+  const token = req.headers['authorization'];
+  try {
+    const result = await validateUser(username, token);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
 
 export = router;

@@ -9,17 +9,15 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-router.get('/yolo', function(req, res) {
-  getPassport()
-    .then(result => {
-      res
-        .status(200)
-        .json(result)
-        .send();
-    })
-    .catch(error => {
-      res.status(400).send();
-    });
+router.get('/yolo', async (req, res) => {
+  const { passportUUID } = req.query;
+  const token = req.headers['authorization'];
+  try {
+    const result = await getPassport();
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
 
 export = router;

@@ -33,15 +33,16 @@ async function createWorker(worker: object) {
 }
 
 async function login(username: string, password: string) {
-  let worker = await findWorker(username);
-  let salt = worker.getSalt();
-  let verifyPassword = crypto
+  const worker = await findWorker(username);
+  const salt = worker.getSalt();
+  const verifyPassword = crypto
     .createHash('sha1')
     .update(password.concat(salt))
     .digest('hex');
   if (verifyPassword === worker.getPassword()) {
     //sign token with username and salt
-    return jwt.sign(worker.getUsername(), salt);
+    const token = jwt.sign(worker.getUsername(), salt);
+    return token;
   } else {
     throw new Error('Invalid password');
   }
