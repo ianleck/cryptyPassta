@@ -1,7 +1,7 @@
 const TruffleAssert = require('truffle-assertions');
 const Passport = artifacts.require('./Passport.sol');
 
-contract('Passport', accounts => {
+contract.only('Passport', accounts => {
   let passportInstance;
 
   before(async () => {
@@ -40,15 +40,18 @@ contract('Passport', accounts => {
     }
   });
 
-  it.only('should add passport successfully', async () => {
+  it('should add passport successfully', async () => {
     try {
       await passportInstance.viewPassport.call('SGD123');
+      console.log('hm');
     } catch (err) {
       assert.ok(/revert/.test(err.message));
       assert.isTrue(
         err.message.includes('[ERROR] No such passport has been created')
       );
-      const createdPassport = await passportInstance.createPassport('SGD123');
+      const createdPassport = await passportInstance.createPassport('SGD123', {
+        from: accounts[1]
+      });
       const retrievedPassport = await passportInstance.viewPassport.call(
         'SGD123'
       );

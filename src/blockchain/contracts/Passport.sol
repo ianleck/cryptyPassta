@@ -1,4 +1,5 @@
 pragma solidity ^0.5.0;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
@@ -16,17 +17,16 @@ contract Passport is ERC721Full, ERC721Mintable {
         string countryCode;
     }
 
-    enum Action {Enter, Exit}
+    enum BorderMovement {ENTRY, EXIT}
 
     struct TravelAction {
         address destination;
-        Action action;
+        BorderMovement movement;
         uint256 datetime;
     }
 
     struct PassportToken {
         bool isActive;
-        mapping(uint256 => TravelAction[]) travelRecord;
         uint256 travelRecordLength;
         address issuingCountry;
     }
@@ -35,18 +35,12 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     //Eg; SG123 to index 1 of passportTokenList
     mapping(string => uint256) internal passportUUIDMapping;
-
+    mapping(string => TravelAction[]) travelRecords;
     PassportToken[] internal passportTokenList;
 
     event countryRegistrationSuccess(string countryCode);
     event passportCreationSuccess(string UUID);
-    event retrievePassport(TravelAction[] travelRecords);
-    /** Add new country - to list + as minter
- *  Create passport
- *  All passports are owned by the country right? Yup
- *  Indiv user is just read only?
- *  They will read only through the UI that we provide right? Yup the country that they are in will own the passport
- */
+    // Add new country - to list + as minter
 
     function registerCountry(address country, string memory countryCode)
         public
@@ -59,10 +53,9 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     function createPassport(string memory UUID) public onlyVerifiedCountry() {
         require(
-            passportUUIDMapping[UUID] != 0,
+            passportUUIDMapping[UUID] == 0,
             "[ERROR] A passport with this UUID has already been created"
         );
-
         PassportToken memory _newPassport;
         _newPassport.isActive = true;
         _newPassport.travelRecordLength = 0;
@@ -74,13 +67,25 @@ contract Passport is ERC721Full, ERC721Mintable {
         emit passportCreationSuccess(UUID);
     }
 
-    function viewPassport(string memory UUID) public {
+    function viewPassport(string memory UUID)
+        public
+        view
+        returns (uint256)
+    // (TravelAction[] memory)
+    {
         require(
             passportUUIDMapping[UUID] != 0,
             "[ERROR] No such passport has been created"
         );
-        PassportToken memory passportToView = passportTokenList[passportUUIDMapping[UUID]];
-        emit retrievePassport(passportToView.travelRecord);
+        uint256 passportLength = passportTokenList[passportUUIDMapping[UUID]]
+            .travelRecordLength;
+        // PassportToken memory passportToView = passportTokenList[passportUUIDMapping[UUID]];
+        // if (passportLength == 0) {
+        //     TravelAction[] memory _tempArray;
+        //     return _tempArray;
+        // }
+        // return travelRecords[UUID];
+        return passportLength;
     }
 
     function freezePassport(string memory UUID)
@@ -92,7 +97,7 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     function addTravelHistory(
         string memory UUID,
-        Action action,
+        BorderMovement movement,
         uint256 timestamp
     ) public onlyOwnerCountry(UUID) {}
 

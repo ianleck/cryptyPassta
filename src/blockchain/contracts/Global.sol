@@ -23,43 +23,68 @@ contract Global {
         bool isActive;
     }
 
-    function addNewWorker(string memory name, address workerAddress) public onlyMinter() {
+    function addNewWorker(string memory name, address workerAddress)
+        public
+        onlyMinter()
+    {
         Worker memory newWorker = Worker(name, msg.sender, true);
         workers[workerAddress] = newWorker;
     }
 
-    function updateWorkerStatus(address workerAddress, string memory name, bool status) public onlyMinter() {
-        require(workers[workerAddress].nationality == msg.sender, "Cannot update status of worker from another country");
+    function updateWorkerStatus(
+        address workerAddress,
+        string memory name,
+        bool status
+    ) public onlyMinter() {
+        require(
+            workers[workerAddress].nationality == msg.sender,
+            "Cannot update status of worker from another country"
+        );
         workers[workerAddress].name = name;
         workers[workerAddress].isActive = status;
     }
 
     //Precondition: Date is in UNIX epoch seconds format
     //PostCondition: Create a transfer Record, Add new travel record to passport
-    function travelerDeparture(string memory UUID, uint256 date, address[] memory travelList) public onlyWorker() {
-
+    function travelerDeparture(
+        string memory UUID,
+        uint256 date,
+        address[] memory travelList
+    ) public onlyWorker() {
         address[] memory travels = travelList;
-        TransferRecord memory newTransfer = TransferRecord(msg.sender, travels, true);
+        TransferRecord memory newTransfer = TransferRecord(
+            msg.sender,
+            travels,
+            true
+        );
         transferAuthority[UUID] = newTransfer;
 
-        passport.addTravelHistory(UUID, Passport.Action.Exit, block.timestamp);
+        passport.addTravelHistory(
+            UUID,
+            Passport.BorderMovement.EXIT,
+            block.timestamp
+        );
     }
 
     //Precondition: Date is in UNIX epoch seconds format
     //Postcondition: Freeze trasnfer record and add new travel record
-    function acceptTraveler(string memory UUID, uint256 date) public onlyWorker() {
-
-
+    function acceptTraveler(string memory UUID, uint256 date)
+        public
+        onlyWorker()
+    {
         transferAuthority[UUID].isPending = false;
 
-        passport.addTravelHistory(UUID, Passport.Action.Enter, block.timestamp);
+        passport.addTravelHistory(
+            UUID,
+            Passport.BorderMovement.EXIT,
+            block.timestamp
+        );
 
     }
 
     //Precondition: transferRequest must exist
     //PostCondition: Flip locations on transfer request
     function rejectTraveler(string memory UUID) public onlyWorker() {
-
         address toLoc = transferAuthority[UUID].prevOwner;
         transferAuthority[UUID].prevOwner = workers[msg.sender].nationality;
         // address[] memory newList = ;
@@ -67,15 +92,17 @@ contract Global {
 
     }
 
-
     modifier onlyMinter() {
-    //   require(passport.checkOwner(msg.sender), "[Error] This is a minter only action");
-      require(true, "[Error] This is a minter only action");
-      _;
+        //   require(passport.checkOwner(msg.sender), "[Error] This is a minter only action");
+        require(true, "[Error] This is a minter only action");
+        _;
     }
 
     modifier onlyWorker() {
-        require(workers[msg.sender].isActive == true, "[Error] This is an active worker only action");
+        require(
+            workers[msg.sender].isActive == true,
+            "[Error] This is an active worker only action"
+        );
         _;
     }
 
