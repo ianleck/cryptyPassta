@@ -16,7 +16,12 @@ contract Global {
     mapping(string => TransferRecord) transferAuthority;
 
     event workerRegistered(string name, address nation, bool isActive);
-    event debug(bool);
+    //departure and arrival, emits passport UUID and country posting the event
+    event departure(string UUID, address country);
+    event arrival(string UUID, address country);
+    event rejection(string UUID, address country);
+
+    //event debug(bool);
 
     struct TransferRecord {
         address prevOwner;
@@ -63,7 +68,7 @@ contract Global {
     //PostCondition: Create a transfer Record, Add new travel record to passport
     function travelerDeparture(string memory UUID, address[] memory travelList)
         public
-        onlyWorker()
+        onlyCountries(msg.sender)
     {
         address[] memory travels = travelList;
         TransferRecord memory newTransfer = TransferRecord(
@@ -73,30 +78,42 @@ contract Global {
         );
         transferAuthority[UUID] = newTransfer;
 
-        passport.addTravelHistory(UUID, Passport.Action.Exit, block.timestamp);
+        //Commented out until passport is complete
+        //passport.addTravelHistory(UUID, Passport.Action.Exit, block.timestamp);
+
+        emit departure(UUID, msg.sender);
     }
 
     //Precondition: Date is in UNIX epoch seconds format
     //Postcondition: Freeze trasnfer record and add new travel record
-    function acceptTraveler(string memory UUID) public onlyWorker() {
+    function acceptTraveler(string memory UUID)
+        public
+        onlyCountries(msg.sender)
+    {
         transferAuthority[UUID].isPending = false;
 
-        passport.addTravelHistory(UUID, Passport.Action.Enter, block.timestamp);
-
+        //Commented out until passport is complete
+        //passport.addTravelHistory(UUID, Passport.Action.Enter, block.timestamp);
+        emit arrival(UUID, msg.sender);
     }
 
     //Precondition: transferRequest must exist
     //PostCondition: Flip locations on transfer request
-    function rejectTraveler(string memory UUID) public onlyWorker() {
+    function rejectTraveler(string memory UUID)
+        public
+        onlyCountries(msg.sender)
+    {
         address toLoc = transferAuthority[UUID].prevOwner;
         transferAuthority[UUID].prevOwner = workers[msg.sender].nationality;
         // address[] memory newList = ;
         transferAuthority[UUID].newOwner = [toLoc];
 
+        emit rejection(UUID, msg.sender);
     }
 
     function checkActiveWorker(address workeraddress)
         public
+        view
         onlyOwner()
         returns (bool)
     {

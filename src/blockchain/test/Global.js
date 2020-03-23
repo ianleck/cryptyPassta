@@ -95,19 +95,35 @@ contract.only("Global", accounts => {
     //Tourist 1 leaves home country A to Country B and is processed by WorkerA
     try {
       let listforA = [countryBacc];
-      globalInstance.travelerDeparture(passportUUID1, listforA, {
-        from: countryAacc
-      });
+      let aDepart = await globalInstance.travelerDeparture(
+        passportUUID1,
+        listforA,
+        {
+          from: countryAacc
+        }
+      );
+      //console.log("A Departs: " + aDepart.eventEmitted);
+
+      TruffleAssert.eventEmitted(aDepart, "departure");
 
       let listforB = [countryAacc];
       //Tourist 2 leaves home country B to Country A and is processed by WorkerB
-      globalInstance.travelerDeparture(passportUUID2, listforB, {
-        from: countryBacc
-      });
+      let bDepart = await globalInstance.travelerDeparture(
+        passportUUID2,
+        listforB,
+        {
+          from: countryBacc
+        }
+      );
+
+      //console.log("B Departs: " + bDepart.eventEmitted);
+
+      TruffleAssert.eventEmitted(bDepart, "departure");
 
       let tx1 = await globalInstance.checkActiveTransfer(passportUUID1, {
         from: platformOwner
       });
+
       let tx2 = await globalInstance.checkActiveTransfer(passportUUID2, {
         from: platformOwner
       });
@@ -125,10 +141,9 @@ contract.only("Global", accounts => {
     }
   });
 
-  /*
   it("Test case 6: Accept Tourist A into Country B", async () => {
-    await globalInstance.acceptTraveler(passportUUID1, {
-      from: workerB
+    let aArrive = await globalInstance.acceptTraveler(passportUUID1, {
+      from: countryBacc //workerB
     });
 
     let tx1 = await globalInstance.checkActiveTransfer(passportUUID1, {
@@ -137,11 +152,12 @@ contract.only("Global", accounts => {
 
     //check result
     assert.equal(tx1, false, "Did not successfully Accept Traveler");
+    TruffleAssert.eventEmitted(aArrive, "arrival");
   });
 
   it("Test case 7: Reject Tourist B from entering Country A", async () => {
-    await globalInstance.rejectTraveler(passportUUID2, {
-      from: workerA
+    let bReject = await globalInstance.rejectTraveler(passportUUID2, {
+      from: countryAacc //workerA
     });
 
     let tx1 = await globalInstance.checkActiveTransfer(passportUUID2, {
@@ -150,11 +166,12 @@ contract.only("Global", accounts => {
 
     //check result
     assert.equal(tx1, true, "Did not successfully reject traveler");
+    TruffleAssert.eventEmitted(bReject, "rejection");
   });
 
   it("Test case 8: Tourist B returns to Country B", async () => {
-    await globalInstance.rejectTraveler(passportUUID2, {
-      from: workerB
+    let bArrive = await globalInstance.acceptTraveler(passportUUID2, {
+      from: countryBacc //workerB
     });
 
     let tx1 = await globalInstance.checkActiveTransfer(passportUUID2, {
@@ -163,6 +180,7 @@ contract.only("Global", accounts => {
 
     //check result
     assert.equal(tx1, false, "Did not successfully accept returning traveler");
+    TruffleAssert.eventEmitted(bArrive, "arrival");
   });
 
   it("Test case 9: Deactivate worker B", async () => {
@@ -177,5 +195,4 @@ contract.only("Global", accounts => {
     //check result
     assert.equal(tx1, false, "Did not successfully deactivate worker");
   });
-  */
 });
