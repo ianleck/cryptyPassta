@@ -76,7 +76,7 @@ router.get('/login', function(req, res) {
 });
 
 router.get('/validateUser', function(req, res) {
-  validateUser(req.query.username, req.headers['authorization'])
+  validateUser(req.headers['authorization'])
     .then(result => {
       res
         .status(200)
