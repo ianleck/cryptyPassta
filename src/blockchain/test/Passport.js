@@ -91,3 +91,4 @@ contract.only('Passport', accounts => {
     assert.equal(updatedPassport.isActive, false);
   });
 });
+
