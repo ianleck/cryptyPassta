@@ -148,10 +148,7 @@ contract Passport is ERC721Full, ERC721Mintable {
         );
         return countryList[countryAddress].countryCode;
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> develop
     function checkVerifiedCountry(address countryAddress)
         public
         view
@@ -159,10 +156,7 @@ contract Passport is ERC721Full, ERC721Mintable {
     {
         return countryList[countryAddress].isVerifiedCountry;
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> develop
     //access modifier functions
     modifier onlyOwner() {
         require(msg.sender == _owner, "[INVALID PERMISSION] Owner Required");

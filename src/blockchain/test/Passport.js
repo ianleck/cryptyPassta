@@ -1,7 +1,7 @@
 const TruffleAssert = require('truffle-assertions');
 const Passport = artifacts.require('./Passport.sol');
 
-contract.only('Passport', accounts => {
+contract('Passport', accounts => {
   let passportInstance;
   const UUID = 'SGD123';
   const SGInstance = accounts[1];
@@ -91,4 +91,3 @@ contract.only('Passport', accounts => {
     assert.equal(updatedPassport.isActive, false);
   });
 });
-
