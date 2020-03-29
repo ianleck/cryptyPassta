@@ -1,10 +1,14 @@
 import { plainToClass } from 'class-transformer';
 import { PassportEntity } from '../model/PassportEntity';
 import PassportRepository = require('../dao/PassportRepository');
-import { PassportContract, CountryAccountAddress } from '../../server';
+import {
+  PassportContract,
+  GlobalContract,
+  CountryAccountAddress
+} from '../../server';
 import { v4 as uuidv4 } from 'uuid';
 
-export { getPassport, createPassport };
+export { getPassport, createPassport, freezePassport };
 
 async function getPassport() {
   const g = await PassportContract.methods.abc().call();
@@ -36,4 +40,19 @@ async function createPassport(passport: object) {
     passportEntity.getPassportUUID()
   );
   return 'Success, gas used: ' + transaction.gasUsed;
+}
+
+async function freezePassport(passportUUID: string) {
+  //estimate gas
+  let gasEst = await PassportContract.methods
+    .freezePassport(passportUUID)
+    .estimateGas({ from: CountryAccountAddress });
+
+  //create in blockchain
+  let transaction = await PassportContract.methods
+    .freezePassport(passportUUID)
+    .send({ from: CountryAccountAddress, gas: gasEst });
+
+  let passport = await PassportRepository.findPassport(passportUUID);
+  return plainToClass(PassportEntity, passport);
 }
