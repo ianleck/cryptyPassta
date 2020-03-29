@@ -24,9 +24,9 @@ async function createPassport(passport: object) {
 
   console.log(passportEntity.getPassportUUID());
   //create in blockchain
-  let transaction = await PassportContract.methods
-    .createPassport(passportEntity.getPassportUUID())
-    .send({ from: CountryAccountAddress });
+  // let transaction = await PassportContract.methods
+  //   .createPassport(passportEntity.getPassportUUID())
+  //   .send({ from: CountryAccountAddress });
 
   await PassportRepository.createPassport(
     passportEntity,
