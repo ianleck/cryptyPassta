@@ -20,7 +20,6 @@ async function findPassport(passportUUID: string) {
 async function createPassport(passport: object) {
   let passportEntity = plainToClass(PassportEntity, passport);
   passportEntity.setPassportUUID(uuidv4());
-  passportEntity.setPassportUUID('ISJDISJDSJDKSJDKSD');
 
   //estimate gas
   let gasEst = await PassportContract.methods

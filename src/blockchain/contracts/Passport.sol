@@ -34,7 +34,7 @@ contract Passport is ERC721Full, ERC721Mintable {
     mapping(address => Country) internal countryList;
 
     //Eg; SG123 to index 1 of passportTokenList
-    mapping(string => uint256) passportUUIDMapping;
+    mapping(string => uint256) internal passportUUIDMapping;
 
     PassportToken[] internal passportTokenList;
 
