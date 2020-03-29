@@ -1,18 +1,44 @@
-import database = require('firebase');
-import { WorkerEntity } from '../model/WorkerEntity';
+import { database } from '../../server';
 
-class PassportRepository {
-  constructor() {}
-
-  findAllWorkers(): Promise<WorkerEntity[]> {
-    var promise = new Promise<WorkerEntity[]>(function(resolve, reject) {
-      // do a thing, possibly async, then…
-      if (true) {
-        resolve([]);
-      } else {
-        reject(Error('It broke'));
-      }
-    });
-    return promise;
-  }
+function findPassport(passportUUID: string): Promise<object> {
+  return new Promise<object>(function(resolve, reject) {
+    database
+      .ref('passport/' + passportUUID)
+      .once('value')
+      .then(function(snapshot) {
+        if (snapshot.val()) resolve(snapshot.val());
+        else reject(Error('Unable to find passport'));
+      });
+  });
 }
+
+function createPassport(
+  pasport: object,
+  passportUUID: string
+): Promise<boolean> {
+  return new Promise<boolean>(function(resolve, reject) {
+    //check passport exists
+    database
+      .ref('passport/' + passportUUID)
+      .once('value')
+      .then(snapshot => {
+        if (snapshot.val()) reject(Error('Passport has already been created'));
+        else {
+          return database
+            .ref('passport/' + passportUUID)
+            .set(pasport)
+            .then(() => {
+              resolve(true);
+            })
+            .catch(error => {
+              reject(Error('Synchronization failed ' + error));
+            });
+        }
+      })
+      .catch(error => {
+        reject(Error('Unable to contact server: ' + error));
+      });
+  });
+}
+
+export { findPassport, createPassport };
