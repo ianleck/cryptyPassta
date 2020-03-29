@@ -34,6 +34,10 @@ const database: firebase.database.Database = firebase.database();
 const web3 = new Web3('ws://localhost:' + process.env.GANACHE_PORT_NUMBER);
 let PassportContract: Contract, GlobalContract: Contract;
 
+if (process.env.COUNTRY_BLOCKCHAIN_ACCOUNT_ADDRESS === undefined)
+  process.exit(0);
+let CountryAccountAddress = process.env.COUNTRY_BLOCKCHAIN_ACCOUNT_ADDRESS;
+
 getPassportContract(web3, process.env.PASSPORT_CONTRACT_ADDRESS)
   .then(initializedPassportContract => {
     PassportContract = initializedPassportContract;
@@ -77,4 +81,4 @@ app.use('/auth', AuthenticationController);
 // Load controllers for routing
 app.use('/passport', PassportController);
 
-export { database, PassportContract, GlobalContract };
+export { database, PassportContract, GlobalContract, CountryAccountAddress };
