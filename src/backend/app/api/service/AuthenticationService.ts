@@ -9,7 +9,14 @@ export { findAllWorkers, findWorker, createWorker, login, validateUser };
 
 async function findAllWorkers() {
   let workerArray = await WorkerRepository.findAllWorkers();
-  return workerArray.map(worker => plainToClass(WorkerEntity, worker));
+  let workerEntityArray: WorkerEntity[] = [];
+  workerArray.forEach(element => {
+    let workerEntity: WorkerEntity = plainToClass(WorkerEntity, element);
+    workerEntity.setPassword('');
+    workerEntity.setSalt('');
+    workerEntityArray.push(workerEntity);
+  });
+  return workerEntityArray;
 }
 
 async function findWorker(username: string) {
