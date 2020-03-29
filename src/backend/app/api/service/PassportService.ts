@@ -20,17 +20,21 @@ async function findPassport(passportUUID: string) {
 async function createPassport(passport: object) {
   let passportEntity = plainToClass(PassportEntity, passport);
   passportEntity.setPassportUUID(uuidv4());
-  // passportEntity.setPassportUUID('ISJDISJDSJDKSJDKSD');
+  passportEntity.setPassportUUID('ISJDISJDSJDKSJDKSD');
 
-  console.log(passportEntity.getPassportUUID());
+  //estimate gas
+  let gasEst = await PassportContract.methods
+    .createPassport(passportEntity.getPassportUUID())
+    .estimateGas({ from: CountryAccountAddress });
+
   //create in blockchain
-  // let transaction = await PassportContract.methods
-  //   .createPassport(passportEntity.getPassportUUID())
-  //   .send({ from: CountryAccountAddress });
+  let transaction = await PassportContract.methods
+    .createPassport(passportEntity.getPassportUUID())
+    .send({ from: CountryAccountAddress, gas: gasEst });
 
   await PassportRepository.createPassport(
     passportEntity,
     passportEntity.getPassportUUID()
   );
-  return 'Success';
+  return 'Success, gas used: ' + transaction.gasUsed;
 }

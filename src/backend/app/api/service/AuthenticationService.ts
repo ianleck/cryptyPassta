@@ -30,13 +30,13 @@ async function createWorker(worker: object) {
 
   await WorkerRepository.createWorker(workerEntity, workerEntity.getUsername());
   //create in blockchain
-  let transactionHash = await GlobalContract.methods
+  let transaction = await GlobalContract.methods
     .addNewWorker(
       workerEntity.getUsername(),
       workerEntity.getBlockchainAddress()
     )
     .send({ from: CountryAccountAddress });
-  return 'Success';
+  return 'Success, gas used: ' + transaction.gasUsed;
 }
 
 async function login(username: string, password: string) {

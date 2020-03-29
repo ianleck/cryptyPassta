@@ -34,7 +34,7 @@ contract Passport is ERC721Full, ERC721Mintable {
     mapping(address => Country) internal countryList;
 
     //Eg; SG123 to index 1 of passportTokenList
-    mapping(string => uint256) internal passportUUIDMapping;
+    mapping(string => uint256) passportUUIDMapping;
 
     PassportToken[] internal passportTokenList;
 
@@ -74,7 +74,6 @@ contract Passport is ERC721Full, ERC721Mintable {
         // consider emitting here
     }
 
-
     function viewPassport(string memory UUID) public {
         require(
             passportUUIDMapping[UUID] != 0,
@@ -88,7 +87,10 @@ contract Passport is ERC721Full, ERC721Mintable {
         public
         onlyIssuingCountry(UUID)
     {
-        require(passportTokenList[passportUUIDMapping[UUID] - 1].isActive == true, "[ERROR] The passport with this UUID must be active");
+        require(
+            passportTokenList[passportUUIDMapping[UUID] - 1].isActive == true,
+            "[ERROR] The passport with this UUID must be active"
+        );
         passportTokenList[passportUUIDMapping[UUID] - 1].isActive = false;
     }
 
