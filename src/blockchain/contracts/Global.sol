@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 import "./Passport.sol";
 
+
 contract Global {
     address public _globalOwner = msg.sender;
     Passport passport;
@@ -59,11 +60,7 @@ contract Global {
         );
         transferAuthority[UUID] = newTransfer;
 
-        passport.addTravelHistory(
-            UUID,
-            Passport.BorderMovement.EXIT,
-            block.timestamp
-        );
+        passport.addTravelRecord(UUID, "EXIT", block.timestamp);
     }
 
     //Precondition: Date is in UNIX epoch seconds format
@@ -74,12 +71,7 @@ contract Global {
     {
         transferAuthority[UUID].isPending = false;
 
-        passport.addTravelHistory(
-            UUID,
-            Passport.BorderMovement.EXIT,
-            block.timestamp
-        );
-
+        passport.addTravelRecord(UUID, "EXIT", block.timestamp);
     }
 
     //Precondition: transferRequest must exist
@@ -89,7 +81,6 @@ contract Global {
         transferAuthority[UUID].prevOwner = workers[msg.sender].nationality;
         // address[] memory newList = ;
         transferAuthority[UUID].newOwner = [toLoc];
-
     }
 
     modifier onlyMinter() {
@@ -105,5 +96,4 @@ contract Global {
         );
         _;
     }
-
 }
