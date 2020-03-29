@@ -40,7 +40,7 @@ contract('Passport', accounts => {
     }
   });
 
-  it.only('should add passport successfully', async () => {
+  it('should add passport successfully', async () => {
     try {
       await passportInstance.viewPassport.call('SGD123');
     } catch (err) {
@@ -58,3 +58,4 @@ contract('Passport', accounts => {
     }
   });
 });
+

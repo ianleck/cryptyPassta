@@ -59,7 +59,7 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     function createPassport(string memory UUID) public onlyVerifiedCountry() {
         require(
-            passportUUIDMapping[UUID] != 0,
+            passportUUIDMapping[UUID] == 0,
             "[ERROR] A passport with this UUID has already been created"
         );
 
@@ -110,7 +110,13 @@ contract Passport is ERC721Full, ERC721Mintable {
         );
         return countryList[countryAddress].countryCode;
     }
-
+    function checkVerifiedCountry(address countryAddress)
+        public
+        view
+        returns (bool)
+    {
+        return countryList[countryAddress].isVerifiedCountry;
+    }
     //access modifier functions
     modifier onlyOwner() {
         require(msg.sender == _owner, "[INVALID PERMISSION] Owner Required");
