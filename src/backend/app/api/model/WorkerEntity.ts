@@ -16,11 +16,11 @@ export class WorkerEntity {
     this.blockchainAddress = blockchainAddress;
   }
 
-  getUsername() {
+  getUsername(): string {
     return this.username;
   }
 
-  getPassword() {
+  getPassword(): string {
     return this.password;
   }
 
@@ -28,7 +28,7 @@ export class WorkerEntity {
     this.password = password;
   }
 
-  getSalt() {
+  getSalt(): string {
     return this.salt;
   }
 
@@ -36,7 +36,7 @@ export class WorkerEntity {
     this.salt = salt;
   }
 
-  getBlockchainAddress() {
+  getBlockchainAddress(): string {
     return this.blockchainAddress;
   }
 }

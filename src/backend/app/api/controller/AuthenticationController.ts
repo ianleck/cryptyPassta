@@ -56,15 +56,20 @@ router.get('/login', async (req, res) => {
   }
 });
 
-router.get('/validateUser', async (req, res) => {
-  const { username } = req.query;
-  const token = req.headers['authorization'];
-  try {
-    const result = await validateUser(username, token);
-    res.status(200).send(result);
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
+router.get('/validateUser', function(req, res) {
+  validateUser(req.headers['authorization'])
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
 });
 
 export = router;

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
+  "engines": {
+    "node": ">=10.19.0"
+  },
   "scripts": {
     "build": "ganache-cli -p 9418",
     "migrate": "cd ./src/blockchain && truffle migrate",
@@ -25,7 +28,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^2.5.0",
     "ganache-cli": "^6.9.1",
-    "truffle": "^5.1.17",
+    "truffle": "^5.1.18",
     "truffle-assertions": "^0.9.2"
   },
   "devDependencies": {
