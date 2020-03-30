@@ -79,7 +79,7 @@ contract Global {
         );
         transferAuthority[UUID] = newTransfer;
 
-        // passport.addTravelRecord(UUID, "EXIT", block.timestamp);
+        passport.addTravelRecord(UUID, "EXIT", block.timestamp);
         emit departure(UUID, msg.sender);
     }
 
@@ -91,7 +91,7 @@ contract Global {
     {
         transferAuthority[UUID].isPending = false;
 
-        // passport.addTravelRecord(UUID, "ENTER", block.timestamp);
+        passport.addTravelRecord(UUID, "ENTER", block.timestamp);
         emit arrival(UUID, msg.sender);
     }
 
