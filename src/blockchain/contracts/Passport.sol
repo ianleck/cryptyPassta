@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
 import "@openzeppelin/contracts/access/roles/MinterRole.sol";
 
+
 contract Passport is ERC721Full, ERC721Mintable {
     address internal _owner;
 
@@ -50,10 +51,7 @@ contract Passport is ERC721Full, ERC721Mintable {
         emit countryRegistrationSuccess(countryCode);
     }
 
-    function createPassport(string memory UUID)
-        public
-        onlyVerifiedCountry(tx.origin)
-    {
+    function createPassport(string memory UUID) public onlyVerifiedCountry() {
         require(
             passportUUIDMapping[UUID] == 0,
             "[ERROR] A passport with this UUID has already been created"
@@ -66,14 +64,14 @@ contract Passport is ERC721Full, ERC721Mintable {
         uint256 _passportId = passportTokenList.push(_newPassport);
         passportUUIDMapping[UUID] = _passportId;
         _mint(msg.sender, _passportId);
-        // consider emitting here
+        emit passportCreationSuccess(UUID);
     }
 
     function addTravelRecord(
         string memory UUID,
         string memory movement,
         uint256 timestamp
-    ) public onlyVerifiedCountry(tx.origin) {
+    ) public onlyVerifiedCountry() {
         require(
             passportUUIDMapping[UUID] != 0,
             "[ERROR] No such passport has been created"
@@ -165,9 +163,9 @@ contract Passport is ERC721Full, ERC721Mintable {
         _;
     }
 
-    modifier onlyVerifiedCountry(address sender) {
+    modifier onlyVerifiedCountry() {
         require(
-            countryList[sender].isVerifiedCountry,
+            countryList[msg.sender].isVerifiedCountry,
             "[INVALID PERMISSION] Verified Country Required"
         );
         _;
