@@ -51,7 +51,10 @@ contract Passport is ERC721Full, ERC721Mintable {
         emit countryRegistrationSuccess(countryCode);
     }
 
-    function createPassport(string memory UUID) public onlyVerifiedCountry() {
+    function createPassport(string memory UUID)
+        public
+        onlyVerifiedCountry(tx.origin)
+    {
         require(
             passportUUIDMapping[UUID] == 0,
             "[ERROR] A passport with this UUID has already been created"
@@ -71,7 +74,7 @@ contract Passport is ERC721Full, ERC721Mintable {
         string memory UUID,
         string memory movement,
         uint256 timestamp
-    ) public onlyVerifiedCountry() {
+    ) public onlyVerifiedCountry(tx.origin) {
         require(
             passportUUIDMapping[UUID] != 0,
             "[ERROR] No such passport has been created"
@@ -163,9 +166,9 @@ contract Passport is ERC721Full, ERC721Mintable {
         _;
     }
 
-    modifier onlyVerifiedCountry() {
+    modifier onlyVerifiedCountry(address sender) {
         require(
-            countryList[msg.sender].isVerifiedCountry,
+            countryList[sender].isVerifiedCountry,
             "[INVALID PERMISSION] Verified Country Required"
         );
         _;
