@@ -7,3 +7,17 @@ export function login(userData: Object) {
     params: userData
   });
 }
+
+export function findWorker(username: Object) {
+  var link = `/auth/findWorker`;
+
+  return axios.get(link, {
+    params: username
+  });
+}
+
+export function createWorker(worker: Object) {
+  var link = `/auth/createWorker`;
+
+  return axios.post(link, worker);
+}

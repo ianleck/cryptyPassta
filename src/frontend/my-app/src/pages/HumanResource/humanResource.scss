@@ -1,0 +1,27 @@
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content {
+  margin-top: 2rem;
+}
+
+.icon-flex {
+  display: flex !important;
+  align-items: center;
+}
+
+.m0 {
+  margin: 0;
+}
+
+.ant-btn-primary {
+  background-color: #6c63ff !important;
+  border-color: #6c63ff !important;
+}
+
+.ant-table-container {
+  border: 1px solid #f0f0f0;
+}
