@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 import "./Passport.sol";
 
+
 contract Global {
     address public _globalOwner = msg.sender;
     Passport passport;
@@ -78,9 +79,7 @@ contract Global {
         );
         transferAuthority[UUID] = newTransfer;
 
-        //Commented out until passport is complete
-        //passport.addTravelHistory(UUID, Passport.Action.Exit, block.timestamp);
-
+        // passport.addTravelRecord(UUID, "EXIT", block.timestamp);
         emit departure(UUID, msg.sender);
     }
 
@@ -92,8 +91,7 @@ contract Global {
     {
         transferAuthority[UUID].isPending = false;
 
-        //Commented out until passport is complete
-        //passport.addTravelHistory(UUID, Passport.Action.Enter, block.timestamp);
+        // passport.addTravelRecord(UUID, "ENTER", block.timestamp);
         emit arrival(UUID, msg.sender);
     }
 

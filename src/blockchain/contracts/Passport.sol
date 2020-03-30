@@ -1,4 +1,5 @@
 pragma solidity ^0.5.0;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
@@ -16,17 +17,14 @@ contract Passport is ERC721Full, ERC721Mintable {
         string countryCode;
     }
 
-    enum Action {Enter, Exit}
-
     struct TravelAction {
         address destination;
-        Action action;
+        string movement;
         uint256 datetime;
     }
 
     struct PassportToken {
         bool isActive;
-        mapping(uint256 => TravelAction[]) travelRecord;
         uint256 travelRecordLength;
         address issuingCountry;
     }
@@ -35,18 +33,13 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     //Eg; SG123 to index 1 of passportTokenList
     mapping(string => uint256) internal passportUUIDMapping;
-
+    mapping(string => TravelAction[]) travelRecords;
     PassportToken[] internal passportTokenList;
 
     event countryRegistrationSuccess(string countryCode);
     event passportCreationSuccess(string UUID);
-    // event retrievePassport(TravelAction[] travelRecords);
-    /** Add new country - to list + as minter
- *  Create passport
- *  All passports are owned by the country right? Yup
- *  Indiv user is just read only?
- *  They will read only through the UI that we provide right? Yup the country that they are in will own the passport
- */
+    event travelRecordAdditionSuccess(string UUID);
+    event freezePassportSuccess(string UUID);
 
     function registerCountry(address country, string memory countryCode)
         public
@@ -62,7 +55,6 @@ contract Passport is ERC721Full, ERC721Mintable {
             passportUUIDMapping[UUID] == 0,
             "[ERROR] A passport with this UUID has already been created"
         );
-
         PassportToken memory _newPassport;
         _newPassport.isActive = true;
         _newPassport.travelRecordLength = 0;
@@ -74,35 +66,76 @@ contract Passport is ERC721Full, ERC721Mintable {
         // consider emitting here
     }
 
-    function viewPassport(string memory UUID) public {
+    function addTravelRecord(
+        string memory UUID,
+        string memory movement,
+        uint256 timestamp
+    ) public onlyVerifiedCountry() {
         require(
             passportUUIDMapping[UUID] != 0,
             "[ERROR] No such passport has been created"
         );
-        PassportToken memory passportToView = passportTokenList[passportUUIDMapping[UUID]];
-        // emit retrievePassport(passportToView.travelRecord);
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToView = passportTokenList[_passportId];
+        require(
+            passportToView.isActive == true,
+            "[ERROR] Passport has been frozen!"
+        );
+        TravelAction memory _newRecord;
+        _newRecord.destination = msg.sender;
+        _newRecord.movement = movement;
+        _newRecord.datetime = timestamp;
+
+        travelRecords[UUID].push(_newRecord);
+        uint256 newTravelRecordLength = passportToView.travelRecordLength + 1;
+        passportToView.travelRecordLength = newTravelRecordLength;
+        passportTokenList[_passportId] = passportToView;
+        emit travelRecordAdditionSuccess(UUID);
     }
 
     function freezePassport(string memory UUID)
         public
         onlyIssuingCountry(UUID)
     {
-        require(
-            passportTokenList[passportUUIDMapping[UUID] - 1].isActive == true,
-            "[ERROR] The passport with this UUID must be active"
-        );
-        passportTokenList[passportUUIDMapping[UUID] - 1].isActive = false;
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToFreeze = passportTokenList[_passportId];
+        passportToFreeze.isActive = false;
+        passportTokenList[_passportId] = passportToFreeze;
+        emit freezePassportSuccess(UUID);
     }
 
-    function addTravelHistory(
-        string memory UUID,
-        Action action,
-        uint256 timestamp
-    ) public onlyOwnerCountry(UUID) {}
+    function viewPassportTravelRecords(string memory UUID)
+        public
+        view
+        returns (TravelAction[] memory)
+    {
+        require(
+            passportUUIDMapping[UUID] != 0,
+            "[ERROR] No such passport has been created"
+        );
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToView = passportTokenList[_passportId];
+        require(
+            passportToView.isActive == true,
+            "[ERROR] Passport has been frozen!"
+        );
+        return travelRecords[UUID];
+    }
 
-    // function viewTravelHistory(string memory UUID) public view onlyOwnerCountry(UUID) returns(TravelAction[] memory) {
+    function viewPassport(string memory UUID)
+        public
+        view
+        returns (PassportToken memory)
+    {
+        require(
+            passportUUIDMapping[UUID] != 0,
+            "[ERROR] No such passport has been created"
+        );
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToView = passportTokenList[_passportId];
+        return passportToView;
+    }
 
-    // }
     function viewRegisteredCountry(address countryAddress)
         public
         view
@@ -114,6 +147,7 @@ contract Passport is ERC721Full, ERC721Mintable {
         );
         return countryList[countryAddress].countryCode;
     }
+
     function checkVerifiedCountry(address countryAddress)
         public
         view
@@ -121,6 +155,7 @@ contract Passport is ERC721Full, ERC721Mintable {
     {
         return countryList[countryAddress].isVerifiedCountry;
     }
+
     //access modifier functions
     modifier onlyOwner() {
         require(msg.sender == _owner, "[INVALID PERMISSION] Owner Required");
@@ -145,7 +180,7 @@ contract Passport is ERC721Full, ERC721Mintable {
 
     modifier onlyIssuingCountry(string memory UUID) {
         require(
-            passportTokenList[passportUUIDMapping[UUID]].issuingCountry ==
+            passportTokenList[passportUUIDMapping[UUID] - 1].issuingCountry ==
                 msg.sender,
             "[INVALID PERMISSION] Passport Token Issuing Country Required"
         );
@@ -159,5 +194,4 @@ contract Passport is ERC721Full, ERC721Mintable {
         );
         _;
     }
-
 }
