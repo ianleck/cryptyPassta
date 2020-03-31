@@ -5,10 +5,30 @@ import WorkerRepository = require('../dao/WorkerRepository');
 import { GlobalContract, CountryAccountAddress } from '../../server';
 import jwt = require('jsonwebtoken');
 
-export { findAllWorkers, findWorker, createWorker, login, validateUser };
+export {
+  findAllWorkers,
+  findWorker,
+  createWorker,
+  login,
+  validateUser,
+  freezeWorker
+};
+
+async function freezeWorker(username: string) {
+  let worker = await findWorker(username);
+  let transaction = await GlobalContract.methods
+    .updateWorkerStatus(
+      worker.getBlockchainAddress(),
+      worker.getUsername(),
+      false
+    )
+    .send({ from: CountryAccountAddress });
+  return 'Success, gas used: ' + transaction.gasUsed;
+}
 
 async function findAllWorkers() {
   let workerArray = await WorkerRepository.findAllWorkers();
+  //convert to entity and remove salt and password
   let workerEntityArray: WorkerEntity[] = [];
   Object.values(workerArray).forEach(element => {
     let workerEntity: WorkerEntity = plainToClass(WorkerEntity, element);
