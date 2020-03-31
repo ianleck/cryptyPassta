@@ -11,7 +11,8 @@ export {
   createWorker,
   login,
   validateUser,
-  freezeWorker
+  freezeWorker,
+  viewWorkerStatus
 };
 
 async function freezeWorker(username: string) {
@@ -24,6 +25,14 @@ async function freezeWorker(username: string) {
     )
     .send({ from: CountryAccountAddress });
   return 'Success, gas used: ' + transaction.gasUsed;
+}
+
+async function viewWorkerStatus(username: string) {
+  let worker = await findWorker(username);
+  let transaction = await GlobalContract.methods
+    .checkActiveWorker(worker.getBlockchainAddress())
+    .call({ from: CountryAccountAddress });
+  return transaction;
 }
 
 async function findAllWorkers() {

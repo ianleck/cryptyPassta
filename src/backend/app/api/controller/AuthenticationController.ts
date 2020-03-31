@@ -5,7 +5,8 @@ import {
   createWorker,
   login,
   validateUser,
-  freezeWorker
+  freezeWorker,
+  viewWorkerStatus
 } from '../service/AuthenticationService';
 
 var router = express.Router();
@@ -92,8 +93,24 @@ router.get('/validateUser', function(req, res) {
     });
 });
 
-router.get('/freezeWorker', function(req, res) {
+router.post('/freezeWorker', function(req, res) {
   freezeWorker(req.query.username)
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
+});
+
+router.post('/viewWorkerFreezeStatus', function(req, res) {
+  viewWorkerStatus(req.query.username)
     .then(result => {
       res
         .status(200)
