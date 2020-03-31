@@ -10,7 +10,7 @@ export { findAllWorkers, findWorker, createWorker, login, validateUser };
 async function findAllWorkers() {
   let workerArray = await WorkerRepository.findAllWorkers();
   let workerEntityArray: WorkerEntity[] = [];
-  workerArray.forEach(element => {
+  Object.values(workerArray).forEach(element => {
     let workerEntity: WorkerEntity = plainToClass(WorkerEntity, element);
     workerEntity.setPassword('');
     workerEntity.setSalt('');
