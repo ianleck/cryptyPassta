@@ -16,6 +16,7 @@ contract Passport is ERC721Full, ERC721Mintable {
     struct Country {
         bool isVerifiedCountry;
         string countryCode;
+        address countryAddress;
     }
 
     struct TravelAction {
@@ -48,7 +49,7 @@ contract Passport is ERC721Full, ERC721Mintable {
         public
         onlyOwner() // Need to change to admin, so there's list of admin instead of just owner. Refer to WhitelistAdminRole.sol
     {
-        countryList[country] = Country(true, countryCode);
+        countryList[country] = Country(true, countryCode, country);
         addMinter(country);
         numRegCountries++;
         countryId[numRegCountries] = country; //avoiding index 0
@@ -167,11 +168,12 @@ contract Passport is ERC721Full, ERC721Mintable {
     function viewRegisteredCountryList()
         public
         view
-        returns (address[] memory)
+        returns (Country[] memory)
     {
-        address[] memory ret = new address[](numRegCountries);
+        Country[] memory ret = new Country[](numRegCountries);
         for (uint256 i = 0; i < numRegCountries; i++) {
-            ret[i] = countryId[i + 1];
+            address countryAdd = countryId[i + 1];
+            ret[i] = countryList[countryAdd];
         }
         return ret;
     }
