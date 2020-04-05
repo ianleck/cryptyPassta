@@ -27,3 +27,17 @@ export function createWorker(worker: Object) {
 
   return axios.post(link, worker);
 }
+
+export function freezeWorker(username: Object) {
+  var link = `/auth/freezeWorker`;
+
+  return axios.post(link, username);
+}
+
+export function viewWorkerFreezeStatus(username: Object) {
+  var link = `/auth/viewWorkerFreezeStatus`;
+
+  return axios.get(link, {
+    params: username
+  });
+}

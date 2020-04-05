@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, Breadcrumb, Tooltip } from 'antd';
-import { LogoutOutlined } from '@ant-design/icons';
+import { PoweroffOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import { ClickParam } from 'antd/lib/menu';
 import Passport from './Passport/passport';
@@ -12,7 +12,7 @@ const { Header, Content, Footer } = Layout;
 require('./workspace.scss');
 
 function Workspace() {
-  const [selectedMenu, setSelectedMenu] = React.useState('HR Management');
+  const [selectedMenu, setSelectedMenu] = React.useState('Passport Management');
   const history = useHistory();
 
   const handleClick = (e: ClickParam) => {
@@ -50,7 +50,7 @@ function Workspace() {
         </div>
         <div>
           <Tooltip placement="bottom" title={'Logout'}>
-            <LogoutOutlined
+            <PoweroffOutlined
               style={{ color: 'white', fontSize: '20px' }}
               onClick={handleLogout}
             />

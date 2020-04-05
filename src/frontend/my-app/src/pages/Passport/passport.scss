@@ -1,0 +1,21 @@
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content {
+  margin-top: 2rem;
+}
+
+.content-passport {
+  margin-top: 2rem;
+}
+
+.search {
+  width: 25rem !important;
+}
+
+button.ant-btn.ant-input-search-button.ant-btn-primary {
+  display: flex !important;
+}

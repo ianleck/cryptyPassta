@@ -52,6 +52,21 @@ function HumanResource() {
             <Tag color="red">Freeze</Tag>
           </span>
         )
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (text: string, record: any) => (
+        <span>
+          <Button
+            type="link"
+            style={{ paddingLeft: 0 }}
+            onClick={() => freezeWorker(record.username)}
+          >
+            Freeze
+          </Button>
+        </span>
+      )
     }
   ];
 
@@ -78,6 +93,12 @@ function HumanResource() {
         });
         setTableData(data);
       })
+      .catch(err => console.log('Error Occur', err));
+  };
+
+  const freezeWorker = (username: string) => {
+    AuthAPI.freezeWorker({ username })
+      .then(res => fetchAllWorker())
       .catch(err => console.log('Error Occur', err));
   };
 
