@@ -4,7 +4,9 @@ import {
   findWorker,
   createWorker,
   login,
-  validateUser
+  validateUser,
+  freezeWorker,
+  viewWorkerStatus
 } from '../service/AuthenticationService';
 
 var router = express.Router();
@@ -58,6 +60,38 @@ router.get('/login', async (req, res) => {
 
 router.get('/validateUser', function(req, res) {
   validateUser(req.headers['authorization'])
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
+});
+
+router.post('/freezeWorker', function(req, res) {
+  freezeWorker(req.query.username)
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
+});
+
+router.get('/viewWorkerFreezeStatus', function(req, res) {
+  viewWorkerStatus(req.query.username)
     .then(result => {
       res
         .status(200)

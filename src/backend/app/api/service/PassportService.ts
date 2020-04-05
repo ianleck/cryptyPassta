@@ -8,7 +8,14 @@ import {
 } from '../../server';
 import { v4 as uuidv4 } from 'uuid';
 
-export { getPassport, createPassport, freezePassport };
+export {
+  getPassport,
+  createPassport,
+  freezePassport,
+  searchPassport,
+  viewPassportContractEvents,
+  viewGlobalContractEvents
+};
 
 async function getPassport() {
   const g = await PassportContract.methods.abc().call();
@@ -55,4 +62,40 @@ async function freezePassport(passportUUID: string) {
 
   let passport = await PassportRepository.findPassport(passportUUID);
   return plainToClass(PassportEntity, passport);
+}
+
+async function searchPassport(passportUUID: string): Promise<any> {
+  let blockchainPassport = await PassportContract.methods
+    .viewPassport(passportUUID)
+    .call({ from: CountryAccountAddress });
+  let blockchainPassportRecords = await PassportContract.methods
+    .viewPassportTravelRecords(passportUUID)
+    .call({ from: CountryAccountAddress });
+
+  if (blockchainPassport.isActive === false)
+    throw new Error('Passport is frozen');
+
+  //get passport entity and add passport records
+  let passportEntity = await PassportRepository.findPassport(passportUUID);
+  passportEntity = {
+    ...passportEntity,
+    travelRecord: blockchainPassportRecords
+  };
+  return passportEntity;
+}
+
+//travelerDeparture
+async function travellerDeparture(
+  passportUUID: string,
+  departureAddresses: string[]
+): Promise<any> {
+  return await PassportContract.methods.travellerDeparture(passportUUID).call();
+}
+
+async function viewPassportContractEvents() {
+  return await PassportContract.events.allEvents();
+}
+
+async function viewGlobalContractEvents() {
+  return await GlobalContract.events.allEvents();
 }

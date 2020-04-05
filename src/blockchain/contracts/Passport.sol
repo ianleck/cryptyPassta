@@ -31,6 +31,8 @@ contract Passport is ERC721Full, ERC721Mintable {
     }
 
     mapping(address => Country) internal countryList;
+    mapping(uint256 => address) internal countryId;
+    uint256 numRegCountries = 0;
 
     //Eg; SG123 to index 1 of passportTokenList
     mapping(string => uint256) internal passportUUIDMapping;
@@ -48,6 +50,8 @@ contract Passport is ERC721Full, ERC721Mintable {
     {
         countryList[country] = Country(true, countryCode);
         addMinter(country);
+        numRegCountries++;
+        countryId[numRegCountries] = country; //avoiding index 0
         emit countryRegistrationSuccess(countryCode);
     }
 
@@ -155,6 +159,18 @@ contract Passport is ERC721Full, ERC721Mintable {
         returns (bool)
     {
         return countryList[countryAddress].isVerifiedCountry;
+    }
+
+    function viewRegisteredCountryList()
+        public
+        view
+        returns (address[] memory)
+    {
+        address[] memory ret = new address[](numRegCountries);
+        for (uint256 i = 0; i < numRegCountries; i++) {
+            ret[i] = countryId[i + 1];
+        }
+        return ret;
     }
 
     //access modifier functions
