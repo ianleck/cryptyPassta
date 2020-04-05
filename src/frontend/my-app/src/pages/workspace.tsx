@@ -34,7 +34,7 @@ function Workspace() {
               float: 'left'
             }}
           >
-            <img src={Logo} width="50px" />
+            <img src={Logo} width="50px" alt="Logo" />
           </div>
           <Menu
             theme="dark"

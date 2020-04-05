@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import * as AuthAPI from '../../webservice/auth';
-import { Button, Radio, Avatar, Modal, Form, Input } from 'antd';
+import { Button, Avatar, Modal, Form, Input } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { Table, Tag } from 'antd';
-
-import Profile from '../../images/Profile/profile1.png';
 
 require('./humanResource.scss');
 
@@ -73,12 +71,12 @@ function HumanResource() {
   };
 
   const fetchAllWorker = () => {
-    AuthAPI.findWorker({ username: 'username' })
+    AuthAPI.findAllWorkers()
       .then(res => {
-        const { username, blockchainAddress } = res.data;
-        setTableData([
-          { profilePic: 'profile1', username, blockchainAddress, status: 0 }
-        ]);
+        const data = res.data.map((w: object, idx: number) => {
+          return { key: idx, profilePic: 'profile' + idx, ...w, status: 0 };
+        });
+        setTableData(data);
       })
       .catch(err => console.log('Error Occur', err));
   };

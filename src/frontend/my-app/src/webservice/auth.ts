@@ -16,6 +16,12 @@ export function findWorker(username: Object) {
   });
 }
 
+export function findAllWorkers() {
+  var link = `/auth/findAllWorkers`;
+
+  return axios.get(link);
+}
+
 export function createWorker(worker: Object) {
   var link = `/auth/createWorker`;
 

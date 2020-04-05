@@ -94,7 +94,7 @@ const Login = () => {
         style={{ backgroundColor: '#ebf4ff', height: '100%' }}
       >
         <div>
-          <img src={LoginLogo} style={{ width: '20rem' }} />
+          <img src={LoginLogo} style={{ width: '20rem' }} alt="login" />
         </div>
       </div>
     </div>
