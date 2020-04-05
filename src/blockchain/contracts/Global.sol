@@ -112,7 +112,7 @@ contract Global {
     function checkActiveWorker(address workeraddress)
         public
         view
-        onlyOwner()
+        onlyCountries(msg.sender)
         returns (bool)
     {
         return workers[workeraddress].isActive;
@@ -121,13 +121,13 @@ contract Global {
     function checkActiveTransfer(string memory UUID)
         public
         view
-        onlyOwner()
+        onlyCountries(msg.sender)
         returns (bool)
     {
         return transferAuthority[UUID].isPending;
     }
 
-    function checkVerifiedCountry(address sender) internal returns (bool) {
+    function checkVerifiedCountry(address sender) internal view returns (bool) {
         string memory result = passport.viewRegisteredCountry(sender);
         return
             keccak256(abi.encodePacked((result))) !=
