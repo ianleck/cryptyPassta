@@ -4,6 +4,8 @@ import {
   createPassport,
   freezePassport,
   searchPassport,
+  getAllCountries,
+  travelerDeparture,
   viewPassportContractEvents,
   viewGlobalContractEvents
 } from '../service/PassportService';
@@ -73,6 +75,38 @@ router.post('/freezePassport', function(req, res) {
 
 router.get('/searchPassport', function(req, res) {
   searchPassport(req.query.passportUUID)
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
+});
+
+router.get('/getCountryList', function(req, res) {
+  getAllCountries()
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
+});
+
+router.post('/travelerDeparture', function(req, res) {
+  travelerDeparture(req.body.passportUUID, req.body.countryList)
     .then(result => {
       res
         .status(200)
