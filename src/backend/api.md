@@ -48,6 +48,23 @@
 
 - Search Passport
 
+## GET /passport/getCountryList
+
+- Get list of country names + address, use country name for departure;
+
+## POST /passport/travelerDeparture
+
+- Set a passport to departure from the country
+- Provide JSON body as such:
+
+      {
+          "passportUUID": "c79f5faf-bf98-4897-861d-42d4dc987e86",
+          "countryList": [
+              "SG",
+              "MY"
+          ]
+      }
+
 ## GET /passport/viewPassportContractEvents
 
 - View passport contract events
