@@ -93,9 +93,9 @@ async function travellerDeparture(
 }
 
 async function viewPassportContractEvents() {
-  await PassportContract.events.allEvents();
+  return await PassportContract.events.allEvents();
 }
 
 async function viewGlobalContractEvents() {
-  await GlobalContract.events.allEvents();
+  return await GlobalContract.events.allEvents();
 }
