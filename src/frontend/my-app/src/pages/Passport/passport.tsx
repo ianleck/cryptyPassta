@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import * as PassportAPI from '../../webservice/passport';
-import { Button, Modal, Form, Input, DatePicker, Empty } from 'antd';
+import { Button, Modal, Form, Input, DatePicker, Empty, message } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
-
-import moment from 'moment';
+import PassportDetail from '../../component/PassportDetail';
 
 require('./passport.scss');
 
@@ -14,14 +13,6 @@ interface Passport {
   ic: string;
   address: string;
 }
-
-const sampleData = {
-  passportUUID: '08e78f3d-3038-4f26-b011-c235d69661d8',
-  name: 'Yuan Rong',
-  dateOfBirth: '1995-07-28',
-  ic: 'S9876543A',
-  address: 'Blk 99 Singapore River #99-00 S(990099)'
-};
 
 function Passport() {
   // ----------------------- STATE------------------------
@@ -34,28 +25,39 @@ function Passport() {
     PassportAPI.createPassport({
       passportUUID: '',
       ...values.passport,
-      dateOfBirth: values.passport.dateOfBirth.format('YYYY-MM-DD')
+      dateOfBirth: values.passport.dateOfBirth.format('YYYY-MM-DD'),
     })
-      .then(res => {
+      .then((res) => {
         setVisible(false);
         console.log(res.data);
+        message.success('Passport Created');
         // use the UUID to search for the new passport
       })
-      .catch(err => console.log('Error Occur', err));
+      .catch((err) => message.error(err));
   };
 
   const searchPassport = (uuid: string) => {
     PassportAPI.searchPassport({ passportUUID: uuid })
-      .then(res => {
+      .then((res) => {
         setPassportInfo(res.data);
       })
-      .catch(err => console.log('Error Occur', err));
+      .catch((err) => message.error(err));
+  };
+
+  const freezePassport = () => {
+    const uuid = passportInfo ? passportInfo.passportUUID : '';
+    PassportAPI.freezePassport({ passportUUID: uuid })
+      .then((res) => {
+        console.log(res.data);
+        message.success('Passport Freeze');
+      })
+      .catch((err) => message.error(err));
   };
 
   // ----------------------- USEEFFECT------------------------
   //Component Did Mount
   useEffect(() => {
-    //setPassportInfo(sampleData);
+    //searchPassport('d60434aa-7fb3-48c6-bac5-77d6761f0a7c');
   }, []);
 
   return (
@@ -67,27 +69,35 @@ function Passport() {
           type="primary"
           icon={<PlusCircleOutlined />}
           size="middle"
-          shape="round"
+          // shape="round"
           onClick={() => setVisible(true)}
         >
           Create Passport
         </Button>
       </div>
       <div className="content">
-        <Input.Search
-          className="search"
-          placeholder="Enter Passport Number"
-          onSearch={value => searchPassport(value)}
-          enterButton
-        />
+        <div className="search-bar">
+          <Input.Search
+            className="search"
+            placeholder="Enter Passport Number"
+            onSearch={(value) => searchPassport(value)}
+            enterButton
+          />
+          <Button
+            className="icon-flex"
+            type="danger"
+            size="middle"
+            disabled={passportInfo === null}
+            onClick={() => freezePassport()}
+          >
+            Freeze Passport
+          </Button>
+        </div>
         <div className="content-passport">
           {passportInfo === null ? (
             <Empty />
           ) : (
-            <div className="passport">
-              <div className="passport-photo"></div>
-              <div className="passport-details"></div>
-            </div>
+            <PassportDetail passportInfo={passportInfo} country={'SG'} />
           )}
         </div>
       </div>
@@ -99,11 +109,11 @@ function Passport() {
         onOk={() => {
           form
             .validateFields()
-            .then(values => {
+            .then((values) => {
               form.resetFields();
               onCreate(values);
             })
-            .catch(info => {
+            .catch((info) => {
               console.log('Validate Failed:', info);
             });
         }}

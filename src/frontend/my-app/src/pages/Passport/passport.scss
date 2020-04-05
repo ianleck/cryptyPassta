@@ -16,6 +16,11 @@
   width: 25rem !important;
 }
 
+.search-bar {
+  display: flex;
+  justify-content: space-between;
+}
+
 button.ant-btn.ant-input-search-button.ant-btn-primary {
   display: flex !important;
 }

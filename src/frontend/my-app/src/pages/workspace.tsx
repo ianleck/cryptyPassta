@@ -12,7 +12,7 @@ const { Header, Content, Footer } = Layout;
 require('./workspace.scss');
 
 function Workspace() {
-  const [selectedMenu, setSelectedMenu] = React.useState('Passport Management');
+  const [selectedMenu, setSelectedMenu] = React.useState('Custom Management');
   const history = useHistory();
 
   const handleClick = (e: ClickParam) => {
@@ -31,7 +31,7 @@ function Workspace() {
           <div
             className="logo"
             style={{
-              float: 'left'
+              float: 'left',
             }}
           >
             <img src={Logo} width="50px" alt="Logo" />
@@ -40,7 +40,7 @@ function Workspace() {
             theme="dark"
             mode="horizontal"
             selectedKeys={[selectedMenu]}
-            onClick={e => handleClick(e)}
+            onClick={(e) => handleClick(e)}
             style={{ lineHeight: '64px', float: 'left' }}
           >
             <Menu.Item key="Passport Management">Passport Management</Menu.Item>
@@ -67,7 +67,7 @@ function Workspace() {
           style={{
             background: '#fff',
             padding: '24px',
-            minHeight: '73vh'
+            minHeight: '73vh',
           }}
         >
           {selectedMenu === 'Passport Management' && <Passport />}

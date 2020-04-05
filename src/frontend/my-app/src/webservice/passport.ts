@@ -4,7 +4,7 @@ export function createPassport(passport: Object) {
   var link = `/passport/createPassport`;
 
   return axios.post(link, passport, {
-    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') }
+    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') },
   });
 }
 
@@ -13,6 +13,14 @@ export function searchPassport(uuid: Object) {
 
   return axios.get(link, {
     params: uuid,
-    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') }
+    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') },
+  });
+}
+
+export function freezePassport(uuid: Object) {
+  var link = `/passport/freezePassport`;
+
+  return axios.post(link, uuid, {
+    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') },
   });
 }
