@@ -72,6 +72,10 @@ contract Global {
         onlyWorker()
     {
         require(travelList.length != 0, "[Error] Empty Travel list");
+        require(
+            transferAuthority[UUID].isPending == false,
+            "[Error] Traveler is already travelling"
+        );
         address[] memory travels = travelList;
         TransferRecord memory newTransfer = TransferRecord(
             msg.sender,
@@ -89,6 +93,10 @@ contract Global {
     //Precondition: Date is in UNIX epoch seconds format
     //Postcondition: Freeze trasnfer record and add new travel record
     function acceptTraveler(string memory UUID) public onlyWorker() {
+        require(
+            transferAuthority[UUID].isPending == true,
+            "[Error] Traveler is not travelling"
+        );
         transferAuthority[UUID].isPending = false;
 
         address location = workers[msg.sender].nationality;

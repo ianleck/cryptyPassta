@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/access/roles/MinterRole.sol";
 contract Passport is ERC721Full, ERC721Mintable {
     address internal _owner;
     address internal _globalAddress;
+    bool internal allowGlobalChange = true;
 
     constructor() public ERC721Full("Passport", "PASS") {
         _owner = msg.sender;
@@ -183,11 +184,27 @@ contract Passport is ERC721Full, ERC721Mintable {
     }
 
     function setGlobalAddress(address global) public onlyOwner() {
+        require(
+            allowGlobalChange == true,
+            "[Invalid action] No changes to Global.sol address can be allowed at this time"
+        );
         _globalAddress = global;
     }
 
     function checkGlobalAddress() public view onlyOwner() returns (address) {
         return _globalAddress;
+    }
+
+    function freezeGlobalChange() public onlyOwner() {
+        require(
+            allowGlobalChange == true,
+            "[Invalid action] No changes to Global.sol address can be allowed at this time"
+        );
+        allowGlobalChange = false;
+    }
+
+    function checkGlobalChange() public view onlyOwner() returns (bool) {
+        return allowGlobalChange;
     }
 
     /*
