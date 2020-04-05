@@ -7,7 +7,10 @@
     "node": ">=10.19.0"
   },
   "scripts": {
-    "build": "ganache-cli -p 9418",
+    "start": "npm-run-all -p build-contract build-frontend -build-backend -s migrate",
+    "build-contract": "ganache-cli -p 9418 -m 'pulp rack antenna patient machine arrest endless ten unusual spice load enlist'",
+    "build-frontend": "cd ./src/backend && npm run tsc && node build/server.js",
+    "build-backend": "cd ./src/frontend && npm start",
     "migrate": "cd ./src/blockchain && truffle migrate",
     "test": "cd ./src/blockchain && truffle test"
   },
@@ -24,7 +27,8 @@
   "dependencies": {
     "@openzeppelin/contracts": "^2.5.0",
     "ganache-cli": "^6.9.1",
-    "truffle": "^5.1.18",
+    "npm-run-all": "^4.1.5",
+    "truffle": "^5.1.20",
     "truffle-assertions": "^0.9.2"
   }
 }
