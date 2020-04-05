@@ -26,17 +26,17 @@ function HumanResource() {
           size={64}
           src={require('../../images/Profile/' + src + '.png')}
         />
-      )
+      ),
     },
     {
       title: 'Username',
       dataIndex: 'username',
-      key: 'username'
+      key: 'username',
     },
     {
       title: 'Blockchain Address',
       dataIndex: 'blockchainAddress',
-      key: 'blockchainAddress'
+      key: 'blockchainAddress',
     },
     {
       title: 'Status',
@@ -51,7 +51,7 @@ function HumanResource() {
           <span>
             <Tag color="red">Freeze</Tag>
           </span>
-        )
+        ),
     },
     {
       title: 'Action',
@@ -66,8 +66,8 @@ function HumanResource() {
             Freeze
           </Button>
         </span>
-      )
-    }
+      ),
+    },
   ];
 
   // ----------------------- STATE------------------------
@@ -78,28 +78,28 @@ function HumanResource() {
   // ----------------------- Function ------------------------
   const onCreate = (values: any) => {
     AuthAPI.createWorker(values.worker)
-      .then(res => {
+      .then((res) => {
         setVisible(false);
         fetchAllWorker();
       })
-      .catch(err => console.log('Error Occur', err));
+      .catch((err) => console.log('Error Occur', err));
   };
 
   const fetchAllWorker = () => {
     AuthAPI.findAllWorkers()
-      .then(res => {
+      .then((res) => {
         const data = res.data.map((w: object, idx: number) => {
           return { key: idx, profilePic: 'profile' + idx, ...w, status: 0 };
         });
         setTableData(data);
       })
-      .catch(err => console.log('Error Occur', err));
+      .catch((err) => console.log('Error Occur', err));
   };
 
   const freezeWorker = (username: string) => {
     AuthAPI.freezeWorker({ username })
-      .then(res => fetchAllWorker())
-      .catch(err => console.log('Error Occur', err));
+      .then((res) => fetchAllWorker())
+      .catch((err) => console.log('Error Occur', err));
   };
 
   // ----------------------- USEEFFECT------------------------
@@ -122,7 +122,7 @@ function HumanResource() {
           type="primary"
           icon={<PlusCircleOutlined />}
           size="middle"
-          shape="round"
+          // shape="round"
           onClick={() => setVisible(true)}
         >
           Add Worker
@@ -139,11 +139,11 @@ function HumanResource() {
         onOk={() => {
           form
             .validateFields()
-            .then(values => {
+            .then((values) => {
               form.resetFields();
               onCreate(values);
             })
-            .catch(info => {
+            .catch((info) => {
               console.log('Validate Failed:', info);
             });
         }}
@@ -174,7 +174,7 @@ function HumanResource() {
             name={['worker', 'blockchainAddress']}
             label="Blockchain Address"
             rules={[
-              { required: true, message: 'Please input a blockchain address!' }
+              { required: true, message: 'Please input a blockchain address!' },
             ]}
           >
             <Input />
