@@ -36,7 +36,21 @@ contract("Global", (accounts) => {
     //console.log(globalInstance.address);
   });
 
-  it("Test case 3: Set up passports for testing", async () => {
+  it("Test case 3: Link Global.sol to Passport.sol", async () => {
+    await passportInstance.setGlobalAddress(globalInstance.address, {
+      from: platformOwner,
+    });
+
+    let result = await passportInstance.checkGlobalAddress({
+      from: platformOwner,
+    });
+
+    //console.log(result);
+
+    assert.equal(result, globalInstance.address);
+  });
+
+  it("Test case 4: Set up passports for testing", async () => {
     const registeredCountryA = await passportInstance.registerCountry(
       countryAacc,
       "AAA",
@@ -72,7 +86,7 @@ contract("Global", (accounts) => {
     TruffleAssert.eventEmitted(bPassport, "passportCreationSuccess");
   });
 
-  it("Test case 4: Register New worker under country A and country B", async () => {
+  it("Test case 5: Register New worker under country A and country B", async () => {
     //console.log("A address: " + workerA);
     //console.log(await passportInstance.checkVerifiedCountry(countryAacc));
     let aWorker = await globalInstance.addNewWorker("workerAAA", workerA, {
@@ -91,7 +105,7 @@ contract("Global", (accounts) => {
     TruffleAssert.eventEmitted(bWorker, "workerRegistered");
   });
 
-  it("Test case 5: Send travellers out from both country A and B", async () => {
+  it("Test case 6: Send travellers out from both country A and B", async () => {
     //Tourist 1 leaves home country A to Country B and is processed by WorkerA
     try {
       let listforA = [countryBacc];
@@ -99,7 +113,7 @@ contract("Global", (accounts) => {
         passportUUID1,
         listforA,
         {
-          from: countryAacc,
+          from: workerA,
         }
       );
       //console.log("A Departs: " + aDepart.eventEmitted);
@@ -112,7 +126,7 @@ contract("Global", (accounts) => {
         passportUUID2,
         listforB,
         {
-          from: countryBacc,
+          from: workerB,
         }
       );
 
@@ -145,9 +159,9 @@ contract("Global", (accounts) => {
     }
   });
 
-  it("Test case 6: Accept Tourist A into Country B", async () => {
+  it("Test case 7: Accept Tourist A into Country B", async () => {
     let aArrive = await globalInstance.acceptTraveler(passportUUID1, {
-      from: countryBacc, //workerB
+      from: workerB, //workerB
     });
 
     let tx1 = await globalInstance.checkActiveTransfer(passportUUID1, {
@@ -159,9 +173,9 @@ contract("Global", (accounts) => {
     TruffleAssert.eventEmitted(aArrive, "arrival");
   });
 
-  it("Test case 7: Reject Tourist B from entering Country A", async () => {
+  it("Test case 8: Reject Tourist B from entering Country A", async () => {
     let bReject = await globalInstance.rejectTraveler(passportUUID2, {
-      from: countryAacc, //workerA
+      from: workerA, //workerA
     });
 
     let tx1 = await globalInstance.checkActiveTransfer(passportUUID2, {
@@ -173,9 +187,9 @@ contract("Global", (accounts) => {
     TruffleAssert.eventEmitted(bReject, "rejection");
   });
 
-  it("Test case 8: Tourist B returns to Country B", async () => {
+  it("Test case 9: Tourist B returns to Country B", async () => {
     let bArrive = await globalInstance.acceptTraveler(passportUUID2, {
-      from: countryBacc, //workerB
+      from: workerB, //workerB
     });
 
     let tx1 = await globalInstance.checkActiveTransfer(passportUUID2, {
@@ -200,10 +214,12 @@ contract("Global", (accounts) => {
     assert.equal(tx1, false, "Did not successfully deactivate worker");
   });
 
+  /*==============================Negative Test cases Section==============================*/
+
   it("Test case 10: Should not be able to register worker if not country", async () => {
     try {
       let aWorker = await globalInstance.addNewWorker("fakeWorker", workerA, {
-        from: workerA,
+        from: accounts[5],
       });
     } catch (error) {
       //check result
@@ -215,17 +231,119 @@ contract("Global", (accounts) => {
     }
   });
 
-  it("Test case 11: Should not be able to register worker if not country", async () => {
+  it("Test case 11: Should not be able to write travel record if not worker", async () => {
     try {
-      let aWorker = await globalInstance.addNewWorker("fakeWorker", workerA, {
-        from: workerA,
+      let listforA = [countryBacc];
+      let aDepart = await globalInstance.travelerDeparture(
+        passportUUID1,
+        listforA,
+        {
+          from: accounts[5],
+        }
+      );
+    } catch (error) {
+      //check result
+      //console.log(error);
+
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [Error] This is an active worker only action -- Reason given: [Error] This is an active worker only action.",
+        "Did not successfully catch invalid worker error for writing travel record"
+      );
+    }
+  });
+
+  it("Test case 12: Should not be able to accept traveller if not worker", async () => {
+    try {
+      let aArrive = await globalInstance.acceptTraveler(passportUUID1, {
+        from: accounts[5], //workerB
       });
     } catch (error) {
       //check result
+      //console.log(error);
+
+      //error message emitted from passport.sol
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [Error] This is an active worker only action -- Reason given: [Error] This is an active worker only action.",
+        "Did not successfully catch invalid worker error for accepting traveler"
+      );
+    }
+  });
+
+  it("Test case 13: Should not be able to reject traveller if not worker", async () => {
+    try {
+      let bReject = await globalInstance.rejectTraveler(passportUUID2, {
+        from: accounts[5], //workerA
+      });
+    } catch (error) {
+      //check result
+      //console.log(error);
+
+      //error message emitted from passport.sol
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [Error] This is an active worker only action -- Reason given: [Error] This is an active worker only action.",
+        "Did not successfully catch invalid worker error for rejecting traveler"
+      );
+    }
+  });
+
+  it("Test case 14: Should not be able to update worker status if not country", async () => {
+    try {
+      await globalInstance.updateWorkerStatus(workerB, "BBB", false, {
+        from: accounts[5],
+      });
+    } catch (error) {
+      //check result
+      //console.log(error);
+
+      //error message emitted from passport.sol
       assert.equal(
         error.message,
         "Returned error: VM Exception while processing transaction: revert [ERROR] No such country has been registered -- Reason given: [ERROR] No such country has been registered.",
-        "Did not successfully catch invalid country error for registering worker"
+        "Did not successfully catch invalid country error for updating worker status"
+      );
+    }
+  });
+
+  it("Test case 15: Should not be able to update worker status if not own country", async () => {
+    try {
+      await globalInstance.updateWorkerStatus(workerB, "BBB", false, {
+        from: countryAacc,
+      });
+    } catch (error) {
+      //check result
+      //console.log(error);
+
+      //error message emitted from global.sol
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert Cannot update status of worker from another country -- Reason given: Cannot update status of worker from another country.",
+        "Did not successfully catch wrong country error for updating worker status"
+      );
+    }
+  });
+
+  it("Test case 16: Should not be able to write travel record if travel list is empty", async () => {
+    try {
+      let listforA = [];
+      let aDepart = await globalInstance.travelerDeparture(
+        passportUUID1,
+        listforA,
+        {
+          from: workerA,
+        }
+      );
+    } catch (error) {
+      //check result
+      //console.log(error);
+
+      //error message emitted from passport.sol
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [Error] Empty Travel list -- Reason given: [Error] Empty Travel list.",
+        "Did not successfully catch empty travel list error for writing travel record"
       );
     }
   });

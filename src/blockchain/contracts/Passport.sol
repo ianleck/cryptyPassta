@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/access/roles/MinterRole.sol";
 
 contract Passport is ERC721Full, ERC721Mintable {
     address internal _owner;
+    address internal _globalAddress;
 
     constructor() public ERC721Full("Passport", "PASS") {
         _owner = msg.sender;
@@ -44,6 +45,7 @@ contract Passport is ERC721Full, ERC721Mintable {
     event passportCreationSuccess(string UUID);
     event travelRecordAdditionSuccess(string UUID);
     event freezePassportSuccess(string UUID);
+    event debug(address line);
 
     function registerCountry(address country, string memory countryCode)
         public
@@ -78,8 +80,9 @@ contract Passport is ERC721Full, ERC721Mintable {
     function addTravelRecord(
         string memory UUID,
         string memory movement,
+        address location,
         uint256 timestamp
-    ) public onlyVerifiedCountry(tx.origin) {
+    ) public onlyGlobal(msg.sender) {
         require(
             passportUUIDMapping[UUID] != 0,
             "[ERROR] No such passport has been created"
@@ -90,8 +93,9 @@ contract Passport is ERC721Full, ERC721Mintable {
             passportToView.isActive == true,
             "[ERROR] Passport has been frozen!"
         );
+
         TravelAction memory _newRecord;
-        _newRecord.destination = msg.sender;
+        _newRecord.destination = location;
         _newRecord.movement = movement;
         _newRecord.datetime = timestamp;
 
@@ -178,6 +182,20 @@ contract Passport is ERC721Full, ERC721Mintable {
         return ret;
     }
 
+    function setGlobalAddress(address global) public onlyOwner() {
+        _globalAddress = global;
+    }
+
+    function checkGlobalAddress() public view onlyOwner() returns (address) {
+        return _globalAddress;
+    }
+
+    /*
+    function checkCaller() public view returns (address) {
+        return msg.sender;
+    }
+    */
+
     //access modifier functions
     modifier onlyOwner() {
         require(msg.sender == _owner, "[INVALID PERMISSION] Owner Required");
@@ -213,6 +231,15 @@ contract Passport is ERC721Full, ERC721Mintable {
         require(
             ownerOf(passportUUIDMapping[UUID]) == msg.sender,
             "[INVALID PERMISSION] Passport Token Owner Required"
+        );
+        _;
+    }
+
+    modifier onlyGlobal(address checkAddress) {
+        //emit debug(msg.sender);
+        require(
+            (checkAddress == _globalAddress) || (msg.sender == _owner),
+            "[INVALID PERMISSION] Only Global.sol"
         );
         _;
     }

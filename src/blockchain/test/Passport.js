@@ -1,13 +1,16 @@
 const TruffleAssert = require("truffle-assertions");
 const Passport = artifacts.require("./Passport.sol");
+const Global = artifacts.require("./Global.sol");
 
 contract("Passport", (accounts) => {
   let passportInstance;
   const UUID = "SGD123";
   const SGInstance = accounts[1];
+  let globalAddress;
 
   before(async () => {
     passportInstance = await Passport.deployed();
+    globalInstance = await Global.deployed();
   });
 
   it("Test case 1: deploys successfully", async () => {
@@ -18,7 +21,22 @@ contract("Passport", (accounts) => {
     assert.notEqual(address, undefined);
   });
 
-  it("Test case 2: should add country successfully", async () => {
+  it("Test case 2: Link Global.sol to Passport.sol", async () => {
+    await passportInstance.setGlobalAddress(globalInstance.address, {
+      from: accounts[0],
+    });
+
+    let result = await passportInstance.checkGlobalAddress({
+      from: accounts[0],
+    });
+
+    //console.log(result);
+    globalAddress = result;
+
+    assert.equal(result, globalInstance.address);
+  });
+
+  it("Test case 3: should add country successfully", async () => {
     try {
       await passportInstance.viewRegisteredCountry.call(SGInstance);
     } catch (err) {
@@ -42,7 +60,7 @@ contract("Passport", (accounts) => {
     }
   });
 
-  it("Test case 3: should add passport successfully", async () => {
+  it("Test case 4: should add passport successfully", async () => {
     try {
       await passportInstance.viewPassport(UUID);
     } catch (err) {
@@ -60,15 +78,16 @@ contract("Passport", (accounts) => {
     }
   });
 
-  it("Test case 4: should be able to add travel records successfully", async () => {
+  it("Test case 5: should be able to add travel records successfully", async () => {
     const createdPassport = await passportInstance.viewPassport(UUID);
     assert.equal(createdPassport.travelRecordLength, "0");
     const timestamp = Math.floor(Date.now() / 1000);
     const addTravelRecord = await passportInstance.addTravelRecord(
       UUID,
       "EXIT",
+      accounts[1],
       timestamp,
-      { from: SGInstance }
+      { from: accounts[0] } // simulate as owner since global cannot be used to simulate
     );
     TruffleAssert.eventEmitted(addTravelRecord, "travelRecordAdditionSuccess");
     const updatedPassport = await passportInstance.viewPassport(UUID);
@@ -82,7 +101,7 @@ contract("Passport", (accounts) => {
     assert.deepEqual(retrievedTravelRecords[0], newRecord);
   });
 
-  it("Test case 5: should be able to freeze passport successfully", async () => {
+  it("Test case 6: should be able to freeze passport successfully", async () => {
     const freezePassport = await passportInstance.freezePassport(UUID, {
       from: SGInstance,
     });
@@ -91,7 +110,7 @@ contract("Passport", (accounts) => {
     assert.equal(updatedPassport.isActive, false);
   });
 
-  it("Test case 6: should return countrylist successfully", async () => {
+  it("Test case 7: should return countrylist successfully", async () => {
     try {
       let countrylist = await passportInstance.viewRegisteredCountryList();
       //console.log(countrylist[0]);
