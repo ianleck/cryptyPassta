@@ -109,7 +109,7 @@ router.post('/freezeWorker', function(req, res) {
     });
 });
 
-router.post('/viewWorkerFreezeStatus', function(req, res) {
+router.get('/viewWorkerFreezeStatus', function(req, res) {
   viewWorkerStatus(req.query.username)
     .then(result => {
       res

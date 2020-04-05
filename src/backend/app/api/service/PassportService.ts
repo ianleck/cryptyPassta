@@ -8,7 +8,14 @@ import {
 } from '../../server';
 import { v4 as uuidv4 } from 'uuid';
 
-export { getPassport, createPassport, freezePassport, searchPassport };
+export {
+  getPassport,
+  createPassport,
+  freezePassport,
+  searchPassport,
+  viewPassportContractEvents,
+  viewGlobalContractEvents
+};
 
 async function getPassport() {
   const g = await PassportContract.methods.abc().call();
@@ -75,4 +82,20 @@ async function searchPassport(passportUUID: string): Promise<any> {
     travelRecord: blockchainPassportRecords
   };
   return passportEntity;
+}
+
+//travelerDeparture
+async function travellerDeparture(
+  passportUUID: string,
+  departureAddresses: string[]
+): Promise<any> {
+  return await PassportContract.methods.travellerDeparture(passportUUID).call();
+}
+
+async function viewPassportContractEvents() {
+  await PassportContract.events.allEvents();
+}
+
+async function viewGlobalContractEvents() {
+  await GlobalContract.events.allEvents();
 }
