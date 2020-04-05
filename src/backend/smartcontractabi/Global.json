@@ -258,21 +258,14 @@
   "ast": {
     "absolutePath": "/C/Users/Lim Shan Jing/Desktop/IS4302/cryptyPassta/src/blockchain/contracts/Global.sol",
     "exportedSymbols": {
-      "Global": [
-        351
-      ]
+      "Global": [351]
     },
     "id": 352,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "^",
-          "0.5",
-          ".0"
-        ],
+        "literals": ["solidity", "^", "0.5", ".0"],
         "nodeType": "PragmaDirective",
         "src": "0:23:0"
       },
@@ -294,9 +287,7 @@
         "documentation": null,
         "fullyImplemented": true,
         "id": 351,
-        "linearizedBaseContracts": [
-          351
-        ],
+        "linearizedBaseContracts": [351],
         "name": "Global",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -1090,9 +1081,7 @@
               "src": "1152:358:0",
               "statements": [
                 {
-                  "assignments": [
-                    79
-                  ],
+                  "assignments": [79],
                   "declarations": [
                     {
                       "constant": false,
@@ -1718,10 +1707,7 @@
                       "id": 116,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        3001,
-                        3002
-                      ],
+                      "overloadedDeclarations": [3001, 3002],
                       "referencedDeclaration": 3002,
                       "src": "1680:7:0",
                       "typeDescriptions": {
@@ -2089,9 +2075,7 @@
               "src": "2213:356:0",
               "statements": [
                 {
-                  "assignments": [
-                    157
-                  ],
+                  "assignments": [157],
                   "declarations": [
                     {
                       "constant": false,
@@ -2148,9 +2132,7 @@
                   "src": "2224:37:0"
                 },
                 {
-                  "assignments": [
-                    161
-                  ],
+                  "assignments": [161],
                   "declarations": [
                     {
                       "constant": false,
@@ -2888,9 +2870,7 @@
               "src": "3192:285:0",
               "statements": [
                 {
-                  "assignments": [
-                    215
-                  ],
+                  "assignments": [215],
                   "declarations": [
                     {
                       "constant": false,
@@ -3771,9 +3751,7 @@
               "src": "3946:198:0",
               "statements": [
                 {
-                  "assignments": [
-                    285
-                  ],
+                  "assignments": [285],
                   "declarations": [
                     {
                       "constant": false,
@@ -4348,10 +4326,7 @@
                       "id": 312,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        3001,
-                        3002
-                      ],
+                      "overloadedDeclarations": [3001, 3002],
                       "referencedDeclaration": 3002,
                       "src": "4298:7:0",
                       "typeDescriptions": {
@@ -4577,10 +4552,7 @@
                       "id": 325,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        3001,
-                        3002
-                      ],
+                      "overloadedDeclarations": [3001, 3002],
                       "referencedDeclaration": 3002,
                       "src": "4412:7:0",
                       "typeDescriptions": {
@@ -4730,10 +4702,7 @@
                       "id": 340,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        3001,
-                        3002
-                      ],
+                      "overloadedDeclarations": [3001, 3002],
                       "referencedDeclaration": 3002,
                       "src": "4602:7:0",
                       "typeDescriptions": {
@@ -4789,21 +4758,14 @@
   "legacyAST": {
     "absolutePath": "/C/Users/Lim Shan Jing/Desktop/IS4302/cryptyPassta/src/blockchain/contracts/Global.sol",
     "exportedSymbols": {
-      "Global": [
-        351
-      ]
+      "Global": [351]
     },
     "id": 352,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "^",
-          "0.5",
-          ".0"
-        ],
+        "literals": ["solidity", "^", "0.5", ".0"],
         "nodeType": "PragmaDirective",
         "src": "0:23:0"
       },
@@ -4825,9 +4787,7 @@
         "documentation": null,
         "fullyImplemented": true,
         "id": 351,
-        "linearizedBaseContracts": [
-          351
-        ],
+        "linearizedBaseContracts": [351],
         "name": "Global",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -5621,9 +5581,7 @@
               "src": "1152:358:0",
               "statements": [
                 {
-                  "assignments": [
-                    79
-                  ],
+                  "assignments": [79],
                   "declarations": [
                     {
                       "constant": false,
@@ -6249,10 +6207,7 @@
                       "id": 116,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        3001,
-                        3002
-                      ],
+                      "overloadedDeclarations": [3001, 3002],
                       "referencedDeclaration": 3002,
                       "src": "1680:7:0",
                       "typeDescriptions": {
@@ -6620,9 +6575,7 @@
               "src": "2213:356:0",
               "statements": [
                 {
-                  "assignments": [
-                    157
-                  ],
+                  "assignments": [157],
                   "declarations": [
                     {
                       "constant": false,
@@ -6679,9 +6632,7 @@
                   "src": "2224:37:0"
                 },
                 {
-                  "assignments": [
-                    161
-                  ],
+                  "assignments": [161],
                   "declarations": [
                     {
                       "constant": false,
@@ -7419,9 +7370,7 @@
               "src": "3192:285:0",
               "statements": [
                 {
-                  "assignments": [
-                    215
-                  ],
+                  "assignments": [215],
                   "declarations": [
                     {
                       "constant": false,
@@ -8302,9 +8251,7 @@
               "src": "3946:198:0",
               "statements": [
                 {
-                  "assignments": [
-                    285
-                  ],
+                  "assignments": [285],
                   "declarations": [
                     {
                       "constant": false,
@@ -8879,10 +8826,7 @@
                       "id": 312,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        3001,
-                        3002
-                      ],
+                      "overloadedDeclarations": [3001, 3002],
                       "referencedDeclaration": 3002,
                       "src": "4298:7:0",
                       "typeDescriptions": {
@@ -9108,10 +9052,7 @@
                       "id": 325,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        3001,
-                        3002
-                      ],
+                      "overloadedDeclarations": [3001, 3002],
                       "referencedDeclaration": 3002,
                       "src": "4412:7:0",
                       "typeDescriptions": {
@@ -9261,10 +9202,7 @@
                       "id": 340,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        3001,
-                        3002
-                      ],
+                      "overloadedDeclarations": [3001, 3002],
                       "referencedDeclaration": 3002,
                       "src": "4602:7:0",
                       "typeDescriptions": {
