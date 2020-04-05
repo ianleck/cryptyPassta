@@ -38,7 +38,15 @@
 ## POST /passport/createPassport
 
 - Create Passport
-- Provide JSON Body
+- Provide JSON Body:
+
+        {
+          "passportUUID": "LEAVE BLANK",
+          "name": "Shan Jing",
+          "dateOfBirth": "1990-10-10",
+          "ic": "S1234567D",
+          "address": "SOME ADDRESS"
+        }
 
 ## POST /passport/freezePassport?passportUUID=passportUUID
 
