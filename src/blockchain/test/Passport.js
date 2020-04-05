@@ -96,7 +96,7 @@ contract("Passport", (accounts) => {
       let countrylist = await passportInstance.viewRegisteredCountryList();
       //console.log(countrylist[0]);
       //console.log(accounts[1]);
-      assert.equal(countrylist[0], accounts[1]);
+      assert.equal(countrylist[0].countryAddress, accounts[1]);
     } catch (error) {
       console.log(error);
     }
