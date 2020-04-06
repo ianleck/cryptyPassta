@@ -55,6 +55,7 @@ contract("Passport", (accounts) => {
     );
   });
 
+  //Negative test case
   it("Test case 4: Attempt to change Global.sol address after freezing, expect failure", async () => {
     try {
       await passportInstance.setGlobalAddress(accounts[5], {
@@ -111,6 +112,7 @@ contract("Passport", (accounts) => {
     }
   });
 
+  //Some negative test cases on add Travel records are tested from Global.js since it access is controlled by Global.sol
   it("Test case 7: should be able to add travel records successfully", async () => {
     const createdPassport = await passportInstance.viewPassport(UUID);
     assert.equal(createdPassport.travelRecordLength, "0");
@@ -151,6 +153,188 @@ contract("Passport", (accounts) => {
       assert.equal(countrylist[0].countryAddress, accounts[1]);
     } catch (error) {
       console.log(error);
+    }
+  });
+
+  /*==============================Negative Test cases Section==============================*/
+  it("Test case 10: Should not be able to register country if not owner", async () => {
+    try {
+      const registeredCountry = await passportInstance.registerCountry(
+        SGInstance,
+        "SGD",
+        {
+          from: accounts[5], //not owner
+        }
+      );
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [INVALID PERMISSION] Owner Required -- Reason given: [INVALID PERMISSION] Owner Required.",
+        "Did not successfully catch invalid account error when registering Country"
+      );
+    }
+  });
+
+  it("Test case 11: Should not be able to create passport with non-country account", async () => {
+    try {
+      const createPassport = await passportInstance.createPassport("BAH1234", {
+        from: accounts[5],
+      });
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [INVALID PERMISSION] Verified Country Required -- Reason given: [INVALID PERMISSION] Verified Country Required.",
+        "Did not successfully catch invalid country account error when creating passport"
+      );
+    }
+  });
+
+  it("Test case 12: Should not be able to create passport with same UUID", async () => {
+    try {
+      const createPassport = await passportInstance.createPassport(UUID, {
+        from: SGInstance,
+      });
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [ERROR] A passport with this UUID has already been created -- Reason given: [ERROR] A passport with this UUID has already been created.",
+        "Did not successfully catch invalid UUID error when creating passport"
+      );
+    }
+  });
+
+  it("Test case 13: Should not be able to add travel record to an invalid UUID passport", async () => {
+    try {
+      const timestamp = Math.floor(Date.now() / 1000);
+      const addTravelRecord = await passportInstance.addTravelRecord(
+        "BAH123",
+        "EXIT",
+        accounts[1],
+        timestamp,
+        { from: accounts[0] } // simulate as owner since global cannot be used to simulate
+      );
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [ERROR] No such passport has been created -- Reason given: [ERROR] No such passport has been created.",
+        "Did not successfully catch invalid UUID error when adding travel records"
+      );
+    }
+  });
+
+  it("Test case 14: Should not be able to add travel record to a frozen passport", async () => {
+    try {
+      const timestamp = Math.floor(Date.now() / 1000);
+      const addTravelRecord = await passportInstance.addTravelRecord(
+        UUID,
+        "EXIT",
+        accounts[1],
+        timestamp,
+        { from: accounts[0] } // simulate as owner since global cannot be used to simulate
+      );
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [ERROR] Passport has been frozen! -- Reason given: [ERROR] Passport has been frozen!.",
+        "Did not successfully catch frozen passport error when adding travel records"
+      );
+    }
+  });
+
+  it("Test case 15: Should not be able to freeze passport of another country", async () => {
+    try {
+      //Create new country
+      const registeredCountry = await passportInstance.registerCountry(
+        accounts[2],
+        "JPN"
+      );
+      assert.equal(
+        await passportInstance.viewRegisteredCountry.call(accounts[2]),
+        "JPN"
+      );
+      TruffleAssert.eventEmitted(
+        registeredCountry,
+        "countryRegistrationSuccess"
+      );
+      TruffleAssert.eventEmitted(registeredCountry, "MinterAdded");
+
+      //Create passport
+      const createPassport = await passportInstance.createPassport("JPN123", {
+        from: accounts[2],
+      });
+      const retrievedPassport = await passportInstance.viewPassport("JPN123");
+      const newPassport = [true, "0", accounts[2]];
+      TruffleAssert.eventEmitted(createPassport, "passportCreationSuccess");
+      assert.deepEqual(retrievedPassport, newPassport);
+
+      //Attempt to freeze JPN passport with SG acc
+      const freezePassport = await passportInstance.freezePassport("JPN123", {
+        from: SGInstance,
+      });
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [INVALID PERMISSION] Passport Token Issuing Country Required -- Reason given: [INVALID PERMISSION] Passport Token Issuing Country Required.",
+        "Did not successfully catch freezing wrong country passport"
+      );
+    }
+  });
+
+  it("Test case 16: Should not be able to view invalid UUID passport", async () => {
+    try {
+      await passportInstance.viewPassportTravelRecords("BAH123");
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [ERROR] No such passport has been created",
+        "Did not successfully catch invalid UUID error when viewing travel records"
+      );
+    }
+  });
+
+  it("Test case 17: Should not be able to view frozen passport", async () => {
+    try {
+      await passportInstance.viewPassportTravelRecords(UUID);
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [ERROR] Passport has been frozen!",
+        "Did not successfully catch frozen passport error when viewing travel records"
+      );
+    }
+  });
+
+  it("Test case 18: Should not be able to view invalid UUID passport", async () => {
+    try {
+      await passportInstance.viewPassport("BAH123");
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [ERROR] No such passport has been created",
+        "Did not successfully catch invalid UUID error when viewing passport"
+      );
+    }
+  });
+
+  it("Test case 19: Should not be able to view invalid country", async () => {
+    try {
+      await passportInstance.viewRegisteredCountry(accounts[5]);
+    } catch (error) {
+      //check result
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [ERROR] No such country has been registered",
+        "Did not successfully catch invalid country error when viewing registered Country"
+      );
     }
   });
 });

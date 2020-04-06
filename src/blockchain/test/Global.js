@@ -378,4 +378,25 @@ contract("Global", (accounts) => {
       );
     }
   });
+
+  it("Test case 20: Deactivated Worker B should not be allowed to depart travelers", async () => {
+    try {
+      let listforB = [countryAacc];
+      //Tourist 2 leaves home country B to Country A and is processed by WorkerB
+      let bDepart = await globalInstance.travelerDeparture(
+        passportUUID2,
+        listforB,
+        {
+          from: workerB,
+        }
+      );
+    } catch (error) {
+      //console.log(e);
+      assert.equal(
+        error.message,
+        "Returned error: VM Exception while processing transaction: revert [Error] This is an active worker only action -- Reason given: [Error] This is an active worker only action.",
+        "Did not successfully catch invalid worker adding travel record"
+      );
+    }
+  });
 });
