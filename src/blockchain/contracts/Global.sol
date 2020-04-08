@@ -84,13 +84,9 @@ contract Global {
         );
         transferAuthority[UUID] = newTransfer;
 
-<<<<<<< HEAD
-        // passport.addTravelRecord(UUID, "EXIT", block.timestamp);
-=======
         address location = workers[msg.sender].nationality;
 
         passport.addTravelRecord(UUID, "EXIT", location, block.timestamp);
->>>>>>> origin/develop
         emit departure(UUID, msg.sender);
     }
 
@@ -103,13 +99,9 @@ contract Global {
         );
         transferAuthority[UUID].isPending = false;
 
-<<<<<<< HEAD
-        // passport.addTravelRecord(UUID, "ENTER", block.timestamp);
-=======
         address location = workers[msg.sender].nationality;
 
         passport.addTravelRecord(UUID, "ENTER", location, block.timestamp);
->>>>>>> origin/develop
         emit arrival(UUID, msg.sender);
     }
 
