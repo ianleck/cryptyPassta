@@ -6,6 +6,8 @@ import {
   searchPassport,
   getAllCountries,
   travelerDeparture,
+  acceptTraveler,
+  rejectTraveler,
   viewPassportContractEvents,
   viewGlobalContractEvents
 } from '../service/PassportService';
@@ -17,7 +19,8 @@ var router = express.Router();
 router.use(function timeLog(req, res, next) {
   console.log('[' + Date.now() + '|PassportController] Request: ' + req.url);
   validateUser(req.headers['authorization'])
-    .then(() => {
+    .then(worker => {
+      res.locals.worker = worker;
       next();
     })
     .catch(error => {
@@ -104,7 +107,43 @@ router.get('/getCountryList', function(req, res) {
 });
 
 router.post('/travelerDeparture', function(req, res) {
-  travelerDeparture(req.body.passportUUID, req.body.countryList)
+  travelerDeparture(
+    req.body.passportUUID,
+    req.body.countryList,
+    res.locals.worker.blockchainAddress
+  )
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
+});
+
+router.post('/acceptTraveler', function(req, res) {
+  acceptTraveler(req.query.passportUUID, res.locals.worker.blockchainAddress)
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
+});
+
+router.post('/rejectTraveler', function(req, res) {
+  rejectTraveler(req.query.passportUUID, res.locals.worker.blockchainAddress)
     .then(result => {
       res
         .status(200)

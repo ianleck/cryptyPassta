@@ -98,7 +98,7 @@ async function validateUser(token: string | undefined) {
   );
 
   try {
-    await findWorker(decodedUsername);
+    return await findWorker(decodedUsername);
   } catch (error) {
     throw new Error('Invalid token');
   }
