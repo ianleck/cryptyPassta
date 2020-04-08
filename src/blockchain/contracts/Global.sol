@@ -69,8 +69,13 @@ contract Global {
     //PostCondition: Create a transfer Record, Add new travel record to passport
     function travelerDeparture(string memory UUID, address[] memory travelList)
         public
-        onlyCountries(msg.sender)
+        onlyWorker()
     {
+        require(travelList.length != 0, "[Error] Empty Travel list");
+        require(
+            transferAuthority[UUID].isPending == false,
+            "[Error] Traveler is already travelling"
+        );
         address[] memory travels = travelList;
         TransferRecord memory newTransfer = TransferRecord(
             msg.sender,
@@ -79,28 +84,38 @@ contract Global {
         );
         transferAuthority[UUID] = newTransfer;
 
+<<<<<<< HEAD
         // passport.addTravelRecord(UUID, "EXIT", block.timestamp);
+=======
+        address location = workers[msg.sender].nationality;
+
+        passport.addTravelRecord(UUID, "EXIT", location, block.timestamp);
+>>>>>>> origin/develop
         emit departure(UUID, msg.sender);
     }
 
     //Precondition: Date is in UNIX epoch seconds format
     //Postcondition: Freeze trasnfer record and add new travel record
-    function acceptTraveler(string memory UUID)
-        public
-        onlyCountries(msg.sender)
-    {
+    function acceptTraveler(string memory UUID) public onlyWorker() {
+        require(
+            transferAuthority[UUID].isPending == true,
+            "[Error] Traveler is not travelling"
+        );
         transferAuthority[UUID].isPending = false;
 
+<<<<<<< HEAD
         // passport.addTravelRecord(UUID, "ENTER", block.timestamp);
+=======
+        address location = workers[msg.sender].nationality;
+
+        passport.addTravelRecord(UUID, "ENTER", location, block.timestamp);
+>>>>>>> origin/develop
         emit arrival(UUID, msg.sender);
     }
 
     //Precondition: transferRequest must exist
     //PostCondition: Flip locations on transfer request
-    function rejectTraveler(string memory UUID)
-        public
-        onlyCountries(msg.sender)
-    {
+    function rejectTraveler(string memory UUID) public onlyWorker() {
         address toLoc = transferAuthority[UUID].prevOwner;
         transferAuthority[UUID].prevOwner = workers[msg.sender].nationality;
         // address[] memory newList = ;
@@ -112,7 +127,7 @@ contract Global {
     function checkActiveWorker(address workeraddress)
         public
         view
-        onlyOwner()
+        onlyCountries(msg.sender)
         returns (bool)
     {
         return workers[workeraddress].isActive;
@@ -121,22 +136,32 @@ contract Global {
     function checkActiveTransfer(string memory UUID)
         public
         view
-        onlyOwner()
+        onlyCountries(msg.sender)
         returns (bool)
     {
         return transferAuthority[UUID].isPending;
     }
 
-    function checkVerifiedCountry(address sender) internal returns (bool) {
+    function checkVerifiedCountry(address sender) internal view returns (bool) {
         string memory result = passport.viewRegisteredCountry(sender);
         return
             keccak256(abi.encodePacked((result))) !=
             keccak256(abi.encodePacked(("")));
     }
 
+    /*
+    function checkCaller() public view returns (address) {
+        address result = passport.checkCaller();
+        return result;
+    }
+    */
+
     modifier onlyCountries(address sender) {
         //   require(passport.checkOwner(msg.sender), "[Error] This is a minter only action");
-        require(checkVerifiedCountry(sender) == true, "Fail");
+        require(
+            checkVerifiedCountry(sender) == true,
+            "[Error] This is an verified Country only action"
+        );
         _;
     }
 
