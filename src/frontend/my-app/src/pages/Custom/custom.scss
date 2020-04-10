@@ -4,6 +4,28 @@
   margin-top: 2rem;
 }
 
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .action-button {
   margin-right: 1rem;
+}
+
+.search {
+  width: 20rem !important;
+}
+
+.mt-3 {
+  margin-top: 3rem;
+}
+
+.ant-tabs-nav .ant-tabs-tab-active {
+  color: #6c63ff !important;
+}
+
+.ant-tabs-ink-bar {
+  background-color: #6c63ff !important;
 }

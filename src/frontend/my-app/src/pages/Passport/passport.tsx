@@ -102,7 +102,7 @@ function Passport() {
         </div>
       </div>
       <Modal
-        title="Add Worker"
+        title="Create Passport"
         visible={visible}
         okText="Submit"
         cancelText="Cancel"

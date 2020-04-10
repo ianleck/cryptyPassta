@@ -24,3 +24,35 @@ export function freezePassport(uuid: Object) {
     headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') },
   });
 }
+
+export function getCountryList() {
+  var link = `/passport/getCountryList`;
+
+  return axios.get(link, {
+    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') },
+  });
+}
+
+export function departTraveler(payload: Object) {
+  var link = `/passport/travelerDeparture`;
+
+  return axios.post(link, payload, {
+    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') },
+  });
+}
+
+export function acceptTraveler(payload: Object) {
+  var link = `/passport/acceptTraveler`;
+
+  return axios.post(link, payload, {
+    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') },
+  });
+}
+
+export function rejectTraveler(payload: Object) {
+  var link = `/passport/rejectTraveler`;
+
+  return axios.post(link, payload, {
+    headers: { authorization: 'Bearer ' + sessionStorage.getItem('session') },
+  });
+}
