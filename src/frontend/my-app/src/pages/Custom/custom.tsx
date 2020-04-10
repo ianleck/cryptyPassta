@@ -28,8 +28,11 @@ function Custom() {
     PassportAPI.searchPassport({ passportUUID: uuid })
       .then((res) => {
         setPassportInfo(res.data);
+        message.success('Passport Found');
       })
-      .catch((err) => message.error(err));
+      .catch((err) => {
+        message.error('Fail to fetch passport');
+      });
   };
 
   const departTraveller = (values: any) => {
@@ -45,7 +48,7 @@ function Custom() {
           setPassportInfo(null);
           // use the UUID to search for the new passport
         })
-        .catch((err) => message.error(err));
+        .catch((err) => message.error('Fail to depart traveller'));
   };
 
   const approveTraveller = () => {
@@ -57,7 +60,7 @@ function Custom() {
           message.success('Traveller approved');
           setPassportInfo(null);
         })
-        .catch((err) => message.error(err));
+        .catch((err) => message.error('Fail to approve traveller'));
     }
   };
 
@@ -70,7 +73,7 @@ function Custom() {
           message.success('Traveller rejected');
           setPassportInfo(null);
         })
-        .catch((err) => message.error(err));
+        .catch((err) => message.error('Fail to reject traveller'));
     }
   };
 

@@ -33,7 +33,7 @@ function Passport() {
         message.success('Passport Created');
         // use the UUID to search for the new passport
       })
-      .catch((err) => message.error(err));
+      .catch((err) => message.error('Fail to create passport'));
   };
 
   const searchPassport = (uuid: string) => {
@@ -41,7 +41,7 @@ function Passport() {
       .then((res) => {
         setPassportInfo(res.data);
       })
-      .catch((err) => message.error(err));
+      .catch((err) => message.error('Fail to find passport'));
   };
 
   const freezePassport = () => {
@@ -51,7 +51,7 @@ function Passport() {
         console.log(res.data);
         message.success('Passport Freeze');
       })
-      .catch((err) => message.error(err));
+      .catch((err) => message.error('Fail to freeze passport'));
   };
 
   // ----------------------- USEEFFECT------------------------

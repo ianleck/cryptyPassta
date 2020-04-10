@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import * as AuthAPI from '../../webservice/auth';
-import { Button, Avatar, Modal, Form, Input } from 'antd';
+import { Button, Avatar, Modal, Form, Input, message } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { Table, Tag } from 'antd';
 
@@ -82,7 +82,7 @@ function HumanResource() {
         setVisible(false);
         fetchAllWorker();
       })
-      .catch((err) => console.log('Error Occur', err));
+      .catch((err) => message.error('Fail to create worker'));
   };
 
   const fetchAllWorker = () => {
@@ -93,13 +93,16 @@ function HumanResource() {
         });
         setTableData(data);
       })
-      .catch((err) => console.log('Error Occur', err));
+      .catch((err) => message.error('Fail to fetch all worker'));
   };
 
   const freezeWorker = (username: string) => {
     AuthAPI.freezeWorker({ username })
-      .then((res) => fetchAllWorker())
-      .catch((err) => console.log('Error Occur', err));
+      .then((res) => {
+        fetchAllWorker();
+        message.success('Worker Freeze');
+      })
+      .catch((err) => message.error('Fail to freeze worker'));
   };
 
   // ----------------------- USEEFFECT------------------------
