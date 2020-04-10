@@ -7,6 +7,7 @@ import {
   CountryAccountAddress
 } from '../../server';
 import { v4 as uuidv4 } from 'uuid';
+import { WorkerEntity } from '../model/WorkerEntity';
 
 export {
   getPassport,
@@ -14,9 +15,11 @@ export {
   freezePassport,
   searchPassport,
   getAllCountries,
+  travelerDeparture,
+  acceptTraveler,
+  rejectTraveler,
   viewPassportContractEvents,
-  viewGlobalContractEvents,
-  travelerDeparture
+  viewGlobalContractEvents
 };
 
 async function getPassport() {
@@ -83,12 +86,19 @@ async function searchPassport(passportUUID: string): Promise<any> {
     throw new Error('Passport is frozen');
 
   //get passport entity and add passport records
-  let passportEntity = await PassportRepository.findPassport(passportUUID);
-  passportEntity = {
-    ...passportEntity,
-    travelRecord: blockchainPassportRecords
-  };
-  return passportEntity;
+  try {
+    let passportEntity = await PassportRepository.findPassport(passportUUID);
+    passportEntity = {
+      ...passportEntity,
+      travelRecord: blockchainPassportRecords
+    };
+    return passportEntity;
+  } catch (error) {
+    //if there is error (Not from my country of origin), just return the travel records that were retrieved from blockchain network
+    return {
+      travelRecord: blockchainPassportRecords
+    };
+  }
 }
 
 async function getAllCountries(): Promise<any> {
@@ -107,7 +117,8 @@ async function getAllCountries(): Promise<any> {
 //travelerDeparture
 async function travelerDeparture(
   passportUUID: string,
-  countryList: string[]
+  countryList: string[],
+  workerAddress: string
 ): Promise<any> {
   //search passport, if frozen, return error;
   let passport = await searchPassport(passportUUID);
@@ -122,19 +133,53 @@ async function travelerDeparture(
     }
   });
 
-  console.log(destinationAddressList);
-
   //estimate gas
   let gasEst = await GlobalContract.methods
     .travelerDeparture(passportUUID, destinationAddressList)
-    .estimateGas({ from: CountryAccountAddress });
+    .estimateGas({ from: workerAddress });
 
   //create in blockchain
   let transaction = await GlobalContract.methods
     .travelerDeparture(passportUUID, destinationAddressList)
-    .send({ from: CountryAccountAddress, gas: gasEst });
+    .send({ from: workerAddress, gas: gasEst });
 
   return 'Success, gas used: ' + transaction.gasUsed;
+}
+
+//acceptTraveler
+async function acceptTraveler(
+  passportUUID: string,
+  workerAddress: string
+): Promise<any> {
+  //estimate gas
+  let gasEst = await GlobalContract.methods
+    .acceptTraveler(passportUUID)
+    .estimateGas({ from: workerAddress });
+
+  //create in blockchain
+  let transaction = await GlobalContract.methods
+    .acceptTraveler(passportUUID)
+    .send({ from: workerAddress, gas: gasEst });
+
+  return 'Traveler accepted, gas used: ' + transaction.gasUsed;
+}
+
+//rejectTraveler
+async function rejectTraveler(
+  passportUUID: string,
+  workerAddress: string
+): Promise<any> {
+  //estimate gas
+  let gasEst = await GlobalContract.methods
+    .rejectTraveler(passportUUID)
+    .estimateGas({ from: workerAddress });
+
+  //create in blockchain
+  let transaction = await GlobalContract.methods
+    .rejectTraveler(passportUUID)
+    .send({ from: workerAddress, gas: gasEst });
+
+  return 'Traveler rejected, gas used: ' + transaction.gasUsed;
 }
 
 async function viewPassportContractEvents() {

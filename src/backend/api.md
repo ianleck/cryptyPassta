@@ -73,6 +73,14 @@
           ]
       }
 
+## POST /passport/acceptTraveler?passportUUID=passportUUID
+
+- Accept a traveler that is travelling to your country
+
+## POST /passport/rejectTraveler?passportUUID=passportUUID
+
+- Reject a traveler that is travelling to your country
+
 ## GET /passport/viewPassportContractEvents
 
 - View passport contract events
