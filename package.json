@@ -10,7 +10,7 @@
     "build": "ganache-cli -p 9418",
     "migrate": "cd ./src/blockchain && truffle migrate",
     "test": "cd ./src/blockchain && truffle test",
-    "start": "concurrently \"cd src/backend && npm run start-dev\" \"cd src/frontEnd/my-app && npm start\"",
+    "start": "concurrently \"cd src/backend && npm run start-dev\" \"cd src/frontend/my-app && npm start\"",
     "install": "concurrently \"cd src/backend && npm install\" \"cd src/frontend/my-app && npm install\"",
     "install:backend": "cd src/backend && npm install",
     "install:frontend": "cd src/frontend/my-app && npm install"
