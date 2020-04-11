@@ -1,0 +1,3 @@
+class TravelRecord {
+  String country;
+}
