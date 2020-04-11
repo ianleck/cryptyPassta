@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mobile/login.dart';
 import 'package:mobile/passport_screen.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -20,14 +23,25 @@ class HomePageState extends State<HomePage> {
   void _handleLogin(String username, String password) {
     print("Username : " + username);
     print("Password : " + password);
-    //TODO : CALL API TO RETRIEVE PASSWORD
+    fetchLogin(username, password);
+  }
+
+  Future<String> fetchLogin(String username, String password) async {
+    var response = await http.get(
+        Uri.encodeFull("http://localhost:4000/auth/login?username=" +
+            username +
+            "&password=" +
+            password),
+        headers: {"Accept": "application/json"});
+    print(response.body);
     setState(() {
-      _jwt = "TEST";
+      _jwt = response.body;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: _jwt == "" ? Login(_handleLogin) : PassportScreen());
+    return Scaffold(
+        body: _jwt == "" ? Login(_handleLogin) : PassportScreen(_jwt));
   }
 }
