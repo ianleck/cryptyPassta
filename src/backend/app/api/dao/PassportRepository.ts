@@ -12,6 +12,20 @@ function findPassport(passportUUID: string): Promise<object> {
   });
 }
 
+function findPassportByNationalIC(passportIC: string): Promise<object> {
+  return new Promise<object>(function(resolve, reject) {
+    database
+      .ref('passport')
+      .orderByChild('ic')
+      .equalTo(passportIC)
+      .once('value')
+      .then(function(snapshot) {
+        if (snapshot.val()) resolve(snapshot.val());
+        else reject(Error('Unable to find passport'));
+      });
+  });
+}
+
 function createPassport(
   pasport: object,
   passportUUID: string
@@ -41,4 +55,4 @@ function createPassport(
   });
 }
 
-export { findPassport, createPassport };
+export { findPassport, createPassport, findPassportByNationalIC };
