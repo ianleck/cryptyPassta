@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import { Button, Input, Empty, message, Tabs, Modal, Form, Select } from 'antd';
-import * as PassportAPI from '../../webservice/passport';
-import PassportDetail from '../../component/PassportDetail';
+import React, { useEffect } from "react";
+import { Button, Input, Empty, message, Tabs, Modal, Form, Select } from "antd";
+import * as PassportAPI from "../../webservice/passport";
+import PassportDetail from "../../component/PassportDetail";
 const { TabPane } = Tabs;
 const { Option } = Select;
 
-require('./custom.scss');
+require("./custom.scss");
 
 interface Passport {
   passportUUID: string;
@@ -18,7 +18,7 @@ interface Passport {
 function Custom() {
   // ----------------------- STATE------------------------
   const [passportInfo, setPassportInfo] = React.useState<Passport | null>(null);
-  const [activeTab, setActiveTab] = React.useState<string>('1');
+  const [activeTab, setActiveTab] = React.useState<string>("1");
   const [visible, setVisible] = React.useState<boolean>(false);
   const [countryList, setCountryList] = React.useState<string[]>([]);
   const [form] = Form.useForm();
@@ -28,10 +28,10 @@ function Custom() {
     PassportAPI.searchPassport({ passportUUID: uuid })
       .then((res) => {
         setPassportInfo(res.data);
-        message.success('Passport Found');
+        message.success("Passport Found");
       })
       .catch((err) => {
-        message.error('Fail to fetch passport');
+        message.error("Fail to fetch passport");
       });
   };
 
@@ -42,13 +42,13 @@ function Custom() {
         ...values.details,
       })
         .then((res) => {
-          // setVisible(false);
+          setVisible(false);
           console.log(res.data);
-          message.success('Traveller departed');
+          message.success("Traveller departed");
           setPassportInfo(null);
           // use the UUID to search for the new passport
         })
-        .catch((err) => message.error('Fail to depart traveller'));
+        .catch((err) => message.error("Fail to depart traveller"));
   };
 
   const approveTraveller = () => {
@@ -57,10 +57,11 @@ function Custom() {
         passportUUID: passportInfo.passportUUID,
       })
         .then((res) => {
-          message.success('Traveller approved');
+          setVisible(false);
+          message.success("Traveller approved");
           setPassportInfo(null);
         })
-        .catch((err) => message.error('Fail to approve traveller'));
+        .catch((err) => message.error("Fail to approve traveller"));
     }
   };
 
@@ -70,10 +71,11 @@ function Custom() {
         passportUUID: passportInfo.passportUUID,
       })
         .then((res) => {
-          message.success('Traveller rejected');
+          setVisible(false);
+          message.success("Traveller rejected");
           setPassportInfo(null);
         })
-        .catch((err) => message.error('Fail to reject traveller'));
+        .catch((err) => message.error("Fail to reject traveller"));
     }
   };
 
@@ -113,12 +115,12 @@ function Custom() {
           {passportInfo === null ? (
             <Empty />
           ) : (
-            <PassportDetail passportInfo={passportInfo} country={'SG'} />
+            <PassportDetail passportInfo={passportInfo} country={"SG"} />
           )}
         </div>
         {passportInfo !== null && (
           <div className="content-footer">
-            {activeTab === '1' ? (
+            {activeTab === "1" ? (
               <React.Fragment>
                 <Button
                   className="action-button"
@@ -172,7 +174,7 @@ function Custom() {
               departTraveller(values);
             })
             .catch((info) => {
-              console.log('Validate Failed:', info);
+              console.log("Validate Failed:", info);
             });
         }}
         onCancel={() => setVisible(false)}
@@ -182,18 +184,18 @@ function Custom() {
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 14 }}
           layout="horizontal"
-          size={'middle'}
+          size={"middle"}
         >
           <Form.Item
-            name={['details', 'countryList']}
+            name={["details", "countryList"]}
             label="Country list"
             rules={[
-              { required: true, message: 'Please select at least one country' },
+              { required: true, message: "Please select at least one country" },
             ]}
           >
             <Select
               mode="multiple"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               placeholder="Please select"
             >
               {countryList.map((c) => (

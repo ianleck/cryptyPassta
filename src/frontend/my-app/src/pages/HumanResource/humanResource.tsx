@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
-import * as AuthAPI from '../../webservice/auth';
-import { Button, Avatar, Modal, Form, Input, message } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
-import { Table, Tag } from 'antd';
+import React, { useEffect } from "react";
+import * as AuthAPI from "../../webservice/auth";
+import { Button, Avatar, Modal, Form, Input, message } from "antd";
+import { PlusCircleOutlined } from "@ant-design/icons";
+import { Table, Tag } from "antd";
 
-require('./humanResource.scss');
+require("./humanResource.scss");
 
 interface Worker {
   profilePic: string;
@@ -18,32 +18,32 @@ function HumanResource() {
   // Profile & Status are hardcoded fields
   const columns = [
     {
-      title: 'Profile',
-      dataIndex: 'profilePic',
-      key: 'profilePic',
+      title: "Profile",
+      dataIndex: "profilePic",
+      key: "profilePic",
       render: (src: string) => (
         <Avatar
           size={64}
-          src={require('../../images/Profile/' + src + '.png')}
+          src={require("../../images/Profile/" + src + ".png")}
         />
       ),
     },
     {
-      title: 'Username',
-      dataIndex: 'username',
-      key: 'username',
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
     },
     {
-      title: 'Blockchain Address',
-      dataIndex: 'blockchainAddress',
-      key: 'blockchainAddress',
+      title: "Blockchain Address",
+      dataIndex: "blockchainAddress",
+      key: "blockchainAddress",
     },
     {
-      title: 'Status',
-      key: 'status',
-      dataIndex: 'status',
+      title: "Status",
+      key: "status",
+      dataIndex: "status",
       render: (status: number) =>
-        status === 0 ? (
+        status ? (
           <span>
             <Tag color="green">Active</Tag>
           </span>
@@ -54,8 +54,8 @@ function HumanResource() {
         ),
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (text: string, record: any) => (
         <span>
           <Button
@@ -82,27 +82,35 @@ function HumanResource() {
         setVisible(false);
         fetchAllWorker();
       })
-      .catch((err) => message.error('Fail to create worker'));
+      .catch((err) => message.error("Fail to create worker"));
   };
 
   const fetchAllWorker = () => {
     AuthAPI.findAllWorkers()
       .then((res) => {
-        const data = res.data.map((w: object, idx: number) => {
-          return { key: idx, profilePic: 'profile' + idx, ...w, status: 0 };
+        return res.data.map((w: object, idx: number) => {
+          return { key: idx, profilePic: "profile" + idx, ...w };
         });
-        setTableData(data);
       })
-      .catch((err) => message.error('Fail to fetch all worker'));
+      .then((data) => {
+        Promise.all(
+          data.map((r: any) => {
+            return AuthAPI.viewWorkerFreezeStatus({
+              username: r.username,
+            }).then((res) => ({ ...r, status: res.data }));
+          })
+        ).then((result: any) => setTableData(result));
+      })
+      .catch((err) => message.error("Fail to fetch all worker"));
   };
 
   const freezeWorker = (username: string) => {
     AuthAPI.freezeWorker({ username })
       .then((res) => {
         fetchAllWorker();
-        message.success('Worker Freeze');
+        message.success("Worker Freeze");
       })
-      .catch((err) => message.error('Fail to freeze worker'));
+      .catch((err) => message.error("Fail to freeze worker"));
   };
 
   // ----------------------- USEEFFECT------------------------
@@ -113,7 +121,7 @@ function HumanResource() {
 
   // For Debugging
   useEffect(() => {
-    console.log('Table Data', tableData);
+    console.log("Table Data", tableData);
   }, [tableData]);
 
   return (
@@ -147,7 +155,7 @@ function HumanResource() {
               onCreate(values);
             })
             .catch((info) => {
-              console.log('Validate Failed:', info);
+              console.log("Validate Failed:", info);
             });
         }}
         onCancel={() => setVisible(false)}
@@ -157,27 +165,27 @@ function HumanResource() {
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 14 }}
           layout="horizontal"
-          size={'middle'}
+          size={"middle"}
         >
           <Form.Item
-            name={['worker', 'username']}
+            name={["worker", "username"]}
             label="Name"
-            rules={[{ required: true, message: 'Please input an username!' }]}
+            rules={[{ required: true, message: "Please input an username!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            name={['worker', 'password']}
+            name={["worker", "password"]}
             label="Password"
-            rules={[{ required: true, message: 'Please input a password!' }]}
+            rules={[{ required: true, message: "Please input a password!" }]}
           >
             <Input.Password />
           </Form.Item>
           <Form.Item
-            name={['worker', 'blockchainAddress']}
+            name={["worker", "blockchainAddress"]}
             label="Blockchain Address"
             rules={[
-              { required: true, message: 'Please input a blockchain address!' },
+              { required: true, message: "Please input a blockchain address!" },
             ]}
           >
             <Input />
