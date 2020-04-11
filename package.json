@@ -7,11 +7,13 @@
     "node": ">=10.19.0"
   },
   "scripts": {
-    "build": "ganache-cli -p 9418",
+    "start": "concurrently \"npm run-script start:blockchain\" \"npm run-script start:main-app\"",
+    "start:blockchain": "concurrently \"npm run-script build:contract\" \"npm run-script migrate\"",
+    "build:contract": "ganache-cli -p 9418 -m 'pulp rack antenna patient machine arrest endless ten unusual spice load enlist'",
     "migrate": "cd ./src/blockchain && truffle migrate",
     "test": "cd ./src/blockchain && truffle test",
-    "start": "concurrently \"cd src/backend && npm run start-dev\" \"cd src/frontEnd/my-app && npm start\"",
     "install": "concurrently \"cd src/backend && npm install\" \"cd src/frontend/my-app && npm install\"",
+    "start:main-app": "concurrently \"cd src/backend && npm run start-dev\" \"cd src/frontEnd/my-app && npm start\"",
     "install:backend": "cd src/backend && npm install",
     "install:frontend": "cd src/frontend/my-app && npm install"
   },
