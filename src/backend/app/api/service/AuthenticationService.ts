@@ -64,15 +64,25 @@ async function createWorker(worker: object) {
   workerEntity.setSalt(salt);
   workerEntity.setPassword(hashedPassword);
 
-  await WorkerRepository.createWorker(workerEntity, workerEntity.getUsername());
-  //create in blockchain
-  let transaction = await GlobalContract.methods
-    .addNewWorker(
-      workerEntity.getUsername(),
-      workerEntity.getBlockchainAddress()
-    )
-    .send({ from: CountryAccountAddress });
-  return 'Success, gas used: ' + transaction.gasUsed;
+  try {
+    await WorkerRepository.findWorker(workerEntity.getUsername());
+    throw new Error('Worker exists');
+  } catch (error) {
+    //if unable to find worker, process
+    //create in blockchain
+    let transaction = await GlobalContract.methods
+      .addNewWorker(
+        workerEntity.getUsername(),
+        workerEntity.getBlockchainAddress()
+      )
+      .send({ from: CountryAccountAddress });
+
+    await WorkerRepository.createWorker(
+      workerEntity,
+      workerEntity.getUsername()
+    );
+    return 'Success, gas used: ' + transaction.gasUsed;
+  }
 }
 
 async function login(username: string, password: string) {
