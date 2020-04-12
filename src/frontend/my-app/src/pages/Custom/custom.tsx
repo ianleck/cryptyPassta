@@ -40,7 +40,7 @@ function Custom() {
   const departTraveller = (values: any) => {
     if (passportInfo != null)
       PassportAPI.departTraveler({
-        passportUUID: passportInfo.passportUUID,
+        passportUUID: uuid,
         ...values.details,
       })
         .then((res) => {
