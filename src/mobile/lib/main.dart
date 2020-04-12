@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile/login.dart';
 import 'package:mobile/passport_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/Models/passport_model.dart';
+import 'dart:convert';
 
 void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -18,7 +20,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  String _jwt = "";
+  bool _isLogin = false;
+  Passport _passportObject;
 
   void _handleLogin(String username, String password) {
     print("Username : " + username);
@@ -26,22 +29,23 @@ class HomePageState extends State<HomePage> {
     fetchLogin(username, password);
   }
 
-  Future<String> fetchLogin(String username, String password) async {
+  Future<Passport> fetchLogin(String username, String password) async {
     var response = await http.get(
-        Uri.encodeFull("http://localhost:4000/auth/login?username=" +
+        Uri.encodeFull("http://localhost:4000/auth/citizenLogin?citizenIC=" +
             username +
-            "&password=" +
+            "&dateOfBirth=" +
             password),
         headers: {"Accept": "application/json"});
     print(response.body);
     setState(() {
-      _jwt = response.body;
+      _passportObject = Passport.fromJson(json.decode(response.body));
+      _isLogin = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: _jwt == "" ? Login(_handleLogin) : PassportScreen(_jwt));
+        body: _isLogin ? PassportScreen(_passportObject) : Login(_handleLogin));
   }
 }

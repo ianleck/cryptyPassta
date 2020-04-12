@@ -1,52 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/Models/passport_model.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class PassportScreen extends StatefulWidget {
-  final String _jwt;
-  PassportScreen(this._jwt);
+  final Passport _passportObject;
+  PassportScreen(this._passportObject);
 
   @override
-  PassportState createState() => PassportState(_jwt);
+  PassportState createState() => PassportState(_passportObject);
 }
 
 class PassportState extends State<PassportScreen> {
-  final String _jwt;
-  Passport _passportObject = Passport(
-      address: "", name: "", ic: "", passportUUID: "", dateOfBirth: "");
+  Passport _passportObject;
 
-  PassportState(this._jwt);
-
-  void fetchPassport() async {
-    var response = await http.get(
-        Uri.encodeFull(
-            "http://localhost:4000/passport/searchPassport?passportUUID=eb4d2a1c-b8a5-446d-a3c5-9be872369a8b"),
-        headers: {
-          "Accept": "application/json",
-          "Authorization": "Bearer " + _jwt
-        });
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      print(json.decode(response.body));
-      setState(() {
-        _passportObject = Passport.fromJson(json.decode(response.body));
-      });
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load passport');
-    }
-  }
-
-  // On load
-  @override
-  void initState() {
-    super.initState();
-    fetchPassport();
-  }
+  PassportState(this._passportObject);
 
   @override
   Widget build(BuildContext context) {
