@@ -6,7 +6,8 @@ import {
   login,
   validateUser,
   freezeWorker,
-  viewWorkerStatus
+  viewWorkerStatus,
+  citizenLogin
 } from '../service/AuthenticationService';
 
 var router = express.Router();
@@ -92,6 +93,22 @@ router.post('/freezeWorker', function(req, res) {
 
 router.get('/viewWorkerFreezeStatus', function(req, res) {
   viewWorkerStatus(req.query.username)
+    .then(result => {
+      res
+        .status(200)
+        .json(result)
+        .send();
+    })
+    .catch(error => {
+      res
+        .status(400)
+        .json(error.message)
+        .send();
+    });
+});
+
+router.get('/citizenLogin', function(req, res) {
+  citizenLogin(req.query.citizenIC, req.query.dateOfBirth)
     .then(result => {
       res
         .status(200)

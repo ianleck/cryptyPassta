@@ -3,11 +3,12 @@ import "./Passport.sol";
 
 
 contract Global {
-    address public _globalOwner = msg.sender;
+    address public _globalOwner;
     Passport passport;
 
     constructor(Passport passportAddress) public {
         passport = passportAddress;
+        _globalOwner = msg.sender;
     }
 
     //Maps address of worker accounts

@@ -2,8 +2,14 @@ import crypto = require('crypto');
 import { plainToClass } from 'class-transformer';
 import { WorkerEntity } from '../model/WorkerEntity';
 import WorkerRepository = require('../dao/WorkerRepository');
-import { GlobalContract, CountryAccountAddress } from '../../server';
+import PassportRepository = require('../dao/PassportRepository');
+import {
+  PassportContract,
+  GlobalContract,
+  CountryAccountAddress
+} from '../../server';
 import jwt = require('jsonwebtoken');
+import { PassportEntity } from '../model/PassportEntity';
 
 export {
   findAllWorkers,
@@ -12,7 +18,8 @@ export {
   login,
   validateUser,
   freezeWorker,
-  viewWorkerStatus
+  viewWorkerStatus,
+  citizenLogin
 };
 
 async function freezeWorker(username: string) {
@@ -98,6 +105,33 @@ async function login(username: string, password: string) {
   } else {
     throw new Error('Invalid password');
   }
+}
+
+async function citizenLogin(citizenIC: string, dateOfBirth: string) {
+  //find passport UUID first
+  let passport = await PassportRepository.findPassportByNationalIC(citizenIC);
+  let passportEntity = plainToClass(PassportEntity, passport);
+
+  //then compare dob
+  if (passportEntity.getDateOfBirth() !== dateOfBirth)
+    throw new Error('Invalid Citizen Login Credentials');
+
+  //then get the records from passport
+  let blockchainPassport = await PassportContract.methods
+    .viewPassport(passportEntity.getPassportUUID())
+    .call({ from: CountryAccountAddress });
+  let blockchainPassportRecords = await PassportContract.methods
+    .viewPassportTravelRecords(passportEntity.getPassportUUID())
+    .call({ from: CountryAccountAddress });
+  if (blockchainPassport.isActive === false)
+    throw new Error('Passport is frozen');
+
+  //then return
+  passport = {
+    ...passport,
+    travelRecord: blockchainPassportRecords
+  };
+  return passportEntity;
 }
 
 async function validateUser(token: string | undefined) {
