@@ -56,7 +56,7 @@ function PassportDetails(props: any) {
           {passportInfo.travelRecord.map((r: any) => (
             <p>
               <span className="title">[{r[1]}]</span> {countryList[r[0]]}{" "}
-              {moment.unix(r[2]).format("MM/DD/YYYY")}
+              {moment.unix(r[2]).format("YYYY-MM-DD")}
             </p>
           ))}
         </div>
