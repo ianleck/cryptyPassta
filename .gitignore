@@ -1,6 +1,5 @@
 node_modules
 build
-.env
 
 # For Mac
 .DS_Store
