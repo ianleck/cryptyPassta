@@ -51,12 +51,7 @@ async function createPassport(passport: object) {
     passportEntity,
     passportEntity.getPassportUUID()
   );
-  return (
-    'Success, gas used: ' +
-    transaction.gasUsed +
-    ', Passport UUID: ' +
-    passportEntity.getPassportUUID()
-  );
+  return 'Success, Passport UUID: ' + passportEntity.getPassportUUID();
 }
 
 async function freezePassport(passportUUID: string) {
