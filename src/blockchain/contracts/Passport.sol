@@ -133,6 +133,39 @@ contract Passport is ERC721Full, ERC721Mintable {
         return travelRecords[UUID];
     }
 
+    //Check if countr
+    function checkAuthorisedDepartureCountry(address sender, string memory UUID)
+        public
+        view
+        returns (bool)
+    {
+        require(
+            passportUUIDMapping[UUID] != 0,
+            "[ERROR] No such passport has been created"
+        );
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToView = passportTokenList[_passportId];
+        require(
+            passportToView.isActive == true,
+            "[ERROR] Passport has been frozen!"
+        );
+
+        TravelAction[] memory records = travelRecords[UUID];
+
+        bool result = false;
+
+        //If first use
+        if (records.length == 0) {
+            result = (passportToView.issuingCountry == sender);
+            return result;
+        } else {
+            //check if last location
+            TravelAction memory x = records[records.length - 1];
+            result = (x.destination == sender);
+            return result;
+        }
+    }
+
     function viewPassport(string memory UUID)
         public
         view
