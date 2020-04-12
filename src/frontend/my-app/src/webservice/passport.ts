@@ -44,7 +44,7 @@ export function departTraveler(payload: Object) {
 export function acceptTraveler(payload: Object) {
   var link = `/passport/acceptTraveler`;
 
-  return axios.post(link, null, {
+  return axios.post(link, payload, {
     headers: { authorization: "Bearer " + sessionStorage.getItem("session") },
     params: payload,
   });
@@ -53,7 +53,7 @@ export function acceptTraveler(payload: Object) {
 export function rejectTraveler(payload: Object) {
   var link = `/passport/rejectTraveler`;
 
-  return axios.post(link, null, {
+  return axios.post(link, payload, {
     headers: { authorization: "Bearer " + sessionStorage.getItem("session") },
     params: payload,
   });

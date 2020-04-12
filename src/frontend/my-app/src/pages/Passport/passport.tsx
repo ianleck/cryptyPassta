@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
-import * as PassportAPI from '../../webservice/passport';
-import { Button, Modal, Form, Input, DatePicker, Empty, message } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
-import PassportDetail from '../../component/PassportDetail';
+import React, { useEffect } from "react";
+import * as PassportAPI from "../../webservice/passport";
+import { Button, Modal, Form, Input, DatePicker, Empty, message } from "antd";
+import { PlusCircleOutlined } from "@ant-design/icons";
+import PassportDetail from "../../component/PassportDetail";
 
-require('./passport.scss');
+require("./passport.scss");
 
 interface Passport {
   passportUUID: string;
@@ -23,17 +23,18 @@ function Passport() {
   // ----------------------- Function ------------------------
   const onCreate = (values: any) => {
     PassportAPI.createPassport({
-      passportUUID: '',
+      passportUUID: "",
       ...values.passport,
-      dateOfBirth: values.passport.dateOfBirth.format('YYYY-MM-DD'),
+      dateOfBirth: values.passport.dateOfBirth.format("YYYY-MM-DD"),
     })
       .then((res) => {
         setVisible(false);
         console.log(res.data);
-        message.success('Passport Created');
+        message.success(res.data);
+        searchPassport(res.data.slice(24));
         // use the UUID to search for the new passport
       })
-      .catch((err) => message.error('Fail to create passport'));
+      .catch((err) => message.error("Fail to create passport"));
   };
 
   const searchPassport = (uuid: string) => {
@@ -41,17 +42,17 @@ function Passport() {
       .then((res) => {
         setPassportInfo(res.data);
       })
-      .catch((err) => message.error('Fail to find passport'));
+      .catch((err) => message.error("Fail to find passport"));
   };
 
   const freezePassport = () => {
-    const uuid = passportInfo ? passportInfo.passportUUID : '';
+    const uuid = passportInfo ? passportInfo.passportUUID : "";
     PassportAPI.freezePassport({ passportUUID: uuid })
       .then((res) => {
         console.log(res.data);
-        message.success('Passport Freeze');
+        message.success("Passport Freeze");
       })
-      .catch((err) => message.error('Fail to freeze passport'));
+      .catch((err) => message.error("Fail to freeze passport"));
   };
 
   // ----------------------- USEEFFECT------------------------
@@ -97,7 +98,7 @@ function Passport() {
           {passportInfo === null ? (
             <Empty />
           ) : (
-            <PassportDetail passportInfo={passportInfo} country={'SG'} />
+            <PassportDetail passportInfo={passportInfo} country={"SG"} />
           )}
         </div>
       </div>
@@ -114,7 +115,7 @@ function Passport() {
               onCreate(values);
             })
             .catch((info) => {
-              console.log('Validate Failed:', info);
+              console.log("Validate Failed:", info);
             });
         }}
         onCancel={() => setVisible(false)}
@@ -124,33 +125,33 @@ function Passport() {
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 14 }}
           layout="horizontal"
-          size={'middle'}
+          size={"middle"}
         >
           <Form.Item
-            name={['passport', 'name']}
+            name={["passport", "name"]}
             label="Name"
-            rules={[{ required: true, message: 'Please input a name!' }]}
+            rules={[{ required: true, message: "Please input a name!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            name={['passport', 'dateOfBirth']}
+            name={["passport", "dateOfBirth"]}
             label="Date Of Birth"
-            rules={[{ required: true, message: 'Please input date of birth!' }]}
+            rules={[{ required: true, message: "Please input date of birth!" }]}
           >
             <DatePicker format="YYYY-MM-DD" />
           </Form.Item>
           <Form.Item
-            name={['passport', 'ic']}
+            name={["passport", "ic"]}
             label="Identity Card No"
-            rules={[{ required: true, message: 'Please input an IC!' }]}
+            rules={[{ required: true, message: "Please input an IC!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            name={['passport', 'address']}
+            name={["passport", "address"]}
             label="Address"
-            rules={[{ required: true, message: 'Please input an address!' }]}
+            rules={[{ required: true, message: "Please input an address!" }]}
           >
             <Input.TextArea />
           </Form.Item>

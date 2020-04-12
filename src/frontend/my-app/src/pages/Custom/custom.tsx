@@ -18,6 +18,7 @@ interface Passport {
 function Custom() {
   // ----------------------- STATE------------------------
   const [passportInfo, setPassportInfo] = React.useState<Passport | null>(null);
+  const [uuid, setUUID] = React.useState<string>("");
   const [activeTab, setActiveTab] = React.useState<string>("1");
   const [visible, setVisible] = React.useState<boolean>(false);
   const [countryList, setCountryList] = React.useState<string[]>([]);
@@ -28,6 +29,7 @@ function Custom() {
     PassportAPI.searchPassport({ passportUUID: uuid })
       .then((res) => {
         setPassportInfo(res.data);
+        setUUID(uuid);
         message.success("Passport Found");
       })
       .catch((err) => {
@@ -54,7 +56,7 @@ function Custom() {
   const approveTraveller = () => {
     if (passportInfo != null) {
       PassportAPI.acceptTraveler({
-        passportUUID: passportInfo.passportUUID,
+        passportUUID: uuid,
       })
         .then((res) => {
           setVisible(false);
@@ -68,7 +70,7 @@ function Custom() {
   const rejectTravller = () => {
     if (passportInfo != null) {
       PassportAPI.rejectTraveler({
-        passportUUID: passportInfo.passportUUID,
+        passportUUID: uuid,
       })
         .then((res) => {
           setVisible(false);
