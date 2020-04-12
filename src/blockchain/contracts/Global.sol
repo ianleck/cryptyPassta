@@ -76,9 +76,17 @@ contract Global {
             transferAuthority[UUID].isPending == false,
             "[Error] Traveler is already travelling"
         );
+        require(
+            checkAuthorisedDepartureCountry(
+                workers[msg.sender].nationality,
+                UUID
+            ) == true,
+            "[Error] Unauthorised country"
+        );
+
         address[] memory travels = travelList;
         TransferRecord memory newTransfer = TransferRecord(
-            msg.sender,
+            workers[msg.sender].nationality,
             travels,
             true
         );
@@ -97,6 +105,14 @@ contract Global {
             transferAuthority[UUID].isPending == true,
             "[Error] Traveler is not travelling"
         );
+        require(
+            checkAuthorisedAcceptanceCountry(
+                workers[msg.sender].nationality,
+                UUID
+            ) == true,
+            "[Error] Unauthorised country"
+        );
+
         transferAuthority[UUID].isPending = false;
 
         address location = workers[msg.sender].nationality;
@@ -108,6 +124,18 @@ contract Global {
     //Precondition: transferRequest must exist
     //PostCondition: Flip locations on transfer request
     function rejectTraveler(string memory UUID) public onlyWorker() {
+        require(
+            transferAuthority[UUID].isPending == true,
+            "[Error] Traveler is not travelling"
+        );
+        require(
+            checkAuthorisedAcceptanceCountry(
+                workers[msg.sender].nationality,
+                UUID
+            ) == true,
+            "[Error] Unauthorised country"
+        );
+
         address toLoc = transferAuthority[UUID].prevOwner;
         transferAuthority[UUID].prevOwner = workers[msg.sender].nationality;
         // address[] memory newList = ;
@@ -139,6 +167,31 @@ contract Global {
         return
             keccak256(abi.encodePacked((result))) !=
             keccak256(abi.encodePacked(("")));
+    }
+
+    function checkAuthorisedDepartureCountry(address sender, string memory UUID)
+        internal
+        view
+        returns (bool)
+    {
+        return passport.checkAuthorisedDepartureCountry(sender, UUID);
+    }
+
+    //Arrival and Rejection checker
+    function checkAuthorisedAcceptanceCountry(
+        address sender,
+        string memory UUID
+    ) internal view returns (bool) {
+        //Check if Worker nationality is the located within TransferAuthority
+        address[] memory list = transferAuthority[UUID].newOwner;
+
+        for (uint256 i = 0; i < list.length; i++) {
+            if (list[i] == sender) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /*
