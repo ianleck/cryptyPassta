@@ -1,20 +1,16 @@
 const Passport = artifacts.require('./Passport.sol');
 const Global = artifacts.require('./Global.sol');
 
-module.exports = deployer => {
+module.exports = (deployer) => {
   deployer
     .then(() => {
       return deployer.deploy(Passport);
     })
-    .then(PassportInstance => {
-      console.log(
-        'Passport Instance deployed at address = ' + PassportInstance.address
-      );
-      return deployer.deploy(Global, PassportInstance.address);
+    .then((Passport) => {
+      console.log('PASSPORT_CONTRACT_ADDRESS=' + Passport.address);
+      return deployer.deploy(Global, Passport.address);
     })
-    .then(GlobalInstance => {
-      console.log(
-        'Global Instance deployed at address = ' + GlobalInstance.address
-      );
+    .then((Global) => {
+      console.log('GLOBAL_CONTRACT_ADDRESS=' + Global.address);
     });
 };

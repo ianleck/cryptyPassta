@@ -1,94 +1,247 @@
 pragma solidity ^0.5.0;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
+import "@openzeppelin/contracts/access/roles/MinterRole.sol";
+
 
 contract Passport is ERC721Full, ERC721Mintable {
-
-    //contract owner
     address internal _owner;
+    address internal _globalAddress;
+    bool internal allowGlobalChange = true;
 
-    struct Country {
-        bool isMinter; 
-        string country;
-        string iso3166Code;
+    constructor() public ERC721Full("Passport", "PASS") {
+        _owner = msg.sender;
     }
 
-    enum Action {Enter, Exit}
+    struct Country {
+        bool isVerifiedCountry;
+        string countryCode;
+        address countryAddress;
+    }
 
     struct TravelAction {
         address destination;
-        Action action;
-        uint256 date;
+        string movement;
+        uint256 datetime;
     }
 
     struct PassportToken {
-        // defaults to false
-        bool isCreated;
-        // nationality of passport owner
-        string nationality;
-        // frozen status
-        bool frozenStatus;
-        //travel record list
-        TravelAction[] travelRecord;
-        //home country
-        address homeCountry;
+        bool isActive;
+        uint256 travelRecordLength;
+        address issuingCountry;
     }
 
-    //mapping of address of minter country to country
-    mapping(address => Country) internal minterCountryAddressMapping;
+    mapping(address => Country) internal countryList;
+    mapping(uint256 => address) internal countryId;
+    uint256 numRegCountries = 0;
 
-    //mapping of passport token uuid to passport token array id
-    mapping(string => uint256) internal passportTokenIdMapping;
-
-    //array of passport token
+    //Eg; SG123 to index 1 of passportTokenList
+    mapping(string => uint256) internal passportUUIDMapping;
+    mapping(string => TravelAction[]) travelRecords;
     PassportToken[] internal passportTokenList;
 
-    //UUID Prefix with Country code
-    function createPassport(string UUID, string nationality) public onlyMinterCountry() {
-        require(passportTokenIdMapping[UUID] != 0, "UUID exist")
-        require(nationality == minters[msg.sender].country, "Error: Nationality Mismatch")
+    event countryRegistrationSuccess(string countryCode);
+    event passportCreationSuccess(string UUID);
+    event travelRecordAdditionSuccess(string UUID);
+    event freezePassportSuccess(string UUID);
+    event debug(address line);
 
-        PassportToken memory _newPassport = PassportToken(
-            true,
-            nationality,
-            false,
-            TravelAction[],
-            msg.sender
+    function registerCountry(address country, string memory countryCode)
+        public
+        onlyOwner() // Need to change to admin, so there's list of admin instead of just owner. Refer to WhitelistAdminRole.sol
+    {
+        countryList[country] = Country(true, countryCode, country);
+        addMinter(country);
+        numRegCountries++;
+        countryId[numRegCountries] = country; //avoiding index 0
+        emit countryRegistrationSuccess(countryCode);
+    }
+
+    function createPassport(string memory UUID) public onlyVerifiedCountry() {
+        require(
+            passportUUIDMapping[UUID] == 0,
+            "[ERROR] A passport with this UUID has already been created"
         );
+        PassportToken memory _newPassport;
+        _newPassport.isActive = true;
+        _newPassport.travelRecordLength = 0;
+        _newPassport.issuingCountry = msg.sender;
 
         uint256 _passportId = passportTokenList.push(_newPassport);
-        passportTokenIdMapping[UUID] = _passportId;
+        passportUUIDMapping[UUID] = _passportId;
         _mint(msg.sender, _passportId);
-
+        emit passportCreationSuccess(UUID);
     }
 
-    function freezePassport(string UUID) public onlyHomeCountry(UUID) {
-        passportTokenList[UUID].frozenStatus = true;
-    }
-
-    
-    function addNewMinterCountry(string uuid, address country, string countryName, string countryCode) public onlyOwner() {
-        Country memory newCountry = Country(
-            true,
-            countryName,
-            countryCode
+    function addTravelRecord(
+        string memory UUID,
+        string memory movement,
+        address location,
+        uint256 timestamp
+    ) public onlyGlobal(msg.sender) {
+        require(
+            passportUUIDMapping[UUID] != 0,
+            "[ERROR] No such passport has been created"
         );
-    }
-    
-    function addTravelHistory(string UUID) public onlyOwnerCountry(UUID) {
-        // bump
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToView = passportTokenList[_passportId];
+        require(
+            passportToView.isActive == true,
+            "[ERROR] Passport has been frozen!"
+        );
+
+        TravelAction memory _newRecord;
+        _newRecord.destination = location;
+        _newRecord.movement = movement;
+        _newRecord.datetime = timestamp;
+
+        travelRecords[UUID].push(_newRecord);
+        uint256 newTravelRecordLength = passportToView.travelRecordLength + 1;
+        passportToView.travelRecordLength = newTravelRecordLength;
+        passportTokenList[_passportId] = passportToView;
+        emit travelRecordAdditionSuccess(UUID);
     }
 
-    function viewTravelHistory() public view onlyOwnerCountry(UUID) returns(TravelAction[]) {
-
+    function freezePassport(string memory UUID)
+        public
+        onlyIssuingCountry(UUID)
+    {
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToFreeze = passportTokenList[_passportId];
+        passportToFreeze.isActive = false;
+        passportTokenList[_passportId] = passportToFreeze;
+        emit freezePassportSuccess(UUID);
     }
 
-    function viewMinterCountry(Address address) public view returns string {
-        Country targetedCountry = minterCountryAddressMapping(address);
-        return targetedCountry.country;
+    function viewPassportTravelRecords(string memory UUID)
+        public
+        view
+        returns (TravelAction[] memory)
+    {
+        require(
+            passportUUIDMapping[UUID] != 0,
+            "[ERROR] No such passport has been created"
+        );
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToView = passportTokenList[_passportId];
+        require(
+            passportToView.isActive == true,
+            "[ERROR] Passport has been frozen!"
+        );
+        return travelRecords[UUID];
     }
-    
+
+    //Check if countr
+    function checkAuthorisedDepartureCountry(address sender, string memory UUID)
+        public
+        view
+        returns (bool)
+    {
+        require(
+            passportUUIDMapping[UUID] != 0,
+            "[ERROR] No such passport has been created"
+        );
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToView = passportTokenList[_passportId];
+        require(
+            passportToView.isActive == true,
+            "[ERROR] Passport has been frozen!"
+        );
+
+        TravelAction[] memory records = travelRecords[UUID];
+
+        bool result = false;
+
+        //If first use
+        if (records.length == 0) {
+            result = (passportToView.issuingCountry == sender);
+            return result;
+        } else {
+            //check if last location
+            TravelAction memory x = records[records.length - 1];
+            result = (x.destination == sender);
+            return result;
+        }
+    }
+
+    function viewPassport(string memory UUID)
+        public
+        view
+        returns (PassportToken memory)
+    {
+        require(
+            passportUUIDMapping[UUID] != 0,
+            "[ERROR] No such passport has been created"
+        );
+        uint256 _passportId = passportUUIDMapping[UUID] - 1;
+        PassportToken memory passportToView = passportTokenList[_passportId];
+        return passportToView;
+    }
+
+    function viewRegisteredCountry(address countryAddress)
+        public
+        view
+        returns (string memory)
+    {
+        require(
+            countryList[countryAddress].isVerifiedCountry == true,
+            "[ERROR] No such country has been registered"
+        );
+        return countryList[countryAddress].countryCode;
+    }
+
+    function checkVerifiedCountry(address countryAddress)
+        public
+        view
+        returns (bool)
+    {
+        return countryList[countryAddress].isVerifiedCountry;
+    }
+
+    function viewRegisteredCountryList()
+        public
+        view
+        returns (Country[] memory)
+    {
+        Country[] memory ret = new Country[](numRegCountries);
+        for (uint256 i = 0; i < numRegCountries; i++) {
+            address countryAdd = countryId[i + 1];
+            ret[i] = countryList[countryAdd];
+        }
+        return ret;
+    }
+
+    function setGlobalAddress(address global) public onlyOwner() {
+        require(
+            allowGlobalChange == true,
+            "[Invalid action] No changes to Global.sol address can be allowed at this time"
+        );
+        _globalAddress = global;
+    }
+
+    function checkGlobalAddress() public view onlyOwner() returns (address) {
+        return _globalAddress;
+    }
+
+    function freezeGlobalChange() public onlyOwner() {
+        require(
+            allowGlobalChange == true,
+            "[Invalid action] No changes to Global.sol address can be allowed at this time"
+        );
+        allowGlobalChange = false;
+    }
+
+    function checkGlobalChange() public view onlyOwner() returns (bool) {
+        return allowGlobalChange;
+    }
+
+    /*
+    function checkCaller() public view returns (address) {
+        return msg.sender;
+    }
+    */
 
     //access modifier functions
     modifier onlyOwner() {
@@ -96,37 +249,45 @@ contract Passport is ERC721Full, ERC721Mintable {
         _;
     }
 
-    modifier onlyMinterCountry() {
+    modifier onlyVerifiedCountry() {
         require(
-            minterCountryAddressMapping[msg.sender].isMinter,
-            "[INVALID PERMISSION] Minter Country Required"
+            countryList[msg.sender].isVerifiedCountry,
+            "[INVALID PERMISSION] Verified Country Required"
         );
         _;
     }
 
-    modifier onlyApproved(string UUID) {
+    modifier onlyApproved(string memory UUID) {
         require(
-            getApproved(passportTokenIdMapping[UUID]) == msg.sender,
+            getApproved(passportUUIDMapping[UUID]) == msg.sender,
             "[INVALID PERMISSION] Approved Sender Required"
         );
         _;
     }
 
-    modifier onlyHomeCountry(string UUID) {
+    modifier onlyIssuingCountry(string memory UUID) {
         require(
-            passportTokenList[passportTokenIdMapping[UUID]].homeCountry ==
+            passportTokenList[passportUUIDMapping[UUID] - 1].issuingCountry ==
                 msg.sender,
-            "[INVALID PERMISSION] Passport Token Home Country Required"
+            "[INVALID PERMISSION] Passport Token Issuing Country Required"
         );
         _;
     }
 
-    modifier onlyOwnerCountry(string UUID) {
+    modifier onlyOwnerCountry(string memory UUID) {
         require(
-            ownerOf(passportTokenIdMapping[UUID]) == msg.sender,
+            ownerOf(passportUUIDMapping[UUID]) == msg.sender,
             "[INVALID PERMISSION] Passport Token Owner Required"
         );
         _;
     }
 
+    modifier onlyGlobal(address checkAddress) {
+        //emit debug(msg.sender);
+        require(
+            (checkAddress == _globalAddress) || (msg.sender == _owner),
+            "[INVALID PERMISSION] Only Global.sol"
+        );
+        _;
+    }
 }
