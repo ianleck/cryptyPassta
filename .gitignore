@@ -1,2 +1,8 @@
 node_modules
 build
+
+# For Mac
+.DS_Store
+passport_address
+migration_output
+global_address

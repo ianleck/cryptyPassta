@@ -7,9 +7,25 @@
     "node": ">=10.19.0"
   },
   "scripts": {
-    "build": "ganache-cli -p 9418",
-    "migrate": "cd ./src/blockchain && truffle migrate",
-    "test": "cd ./src/blockchain && truffle test"
+    "start:blockchain": "npm-run-all -p build:contract migrate",
+    "start:main-app": "npm-run-all -p start:backend start:frontend",
+    "start:backend": "cd src/backend && npm run start-dev",
+    "start:frontend": "cd src/frontend/my-app && npm start",
+    "replace:linux": "npm-run-all grep linux:passport linux:global",
+    "replace:mac": "npm-run-all grep mac:passport mac:global",
+    "linux:passport": "bash -c \"sed -i \"/PASSPORT_CONTRACT_ADDRESS/c\\\\$(cat passport_address)\" src/backend/.env\"",
+    "linux:global": "bash -c \"sed -i \"/GLOBAL_CONTRACT_ADDRESS/c\\\\$(cat global_address)\" src/backend/.env\"",
+    "mac:passport": "bash -c \"sed -i '' \"16s/.*/$(cat passport_address)/\" src/backend/.env\"",
+    "mac:global": "bash -c \"sed -i '' \"17s/.*/$(cat global_address)/\" src/backend/.env\"",
+    "grep": "npm-run-all -p grep:passport grep:global",
+    "grep:passport": "bash -c \"grep 'PASSPORT_CONTRACT_ADDRESS:' ./migration_output > passport_address\"",
+    "grep:global": "bash -c \"grep 'GLOBAL_CONTRACT_ADDRESS:' ./migration_output > global_address\"",
+    "build:contract": "ganache-cli -p 9418 -m 'pulp rack antenna patient machine arrest endless ten unusual spice load enlist'",
+    "migrate": "cd src/blockchain && truffle migrate > ../../migration_output",
+    "test": "cd src/blockchain && truffle test",
+    "install": "npm-run-all -p install:backend install:frontend",
+    "install:backend": "cd src/backend && npm install",
+    "install:frontend": "cd src/frontend/my-app && npm install"
   },
   "repository": {
     "type": "git",
@@ -23,8 +39,10 @@
   "homepage": "https://github.com/ianleck/cryptyPassta#readme",
   "dependencies": {
     "@openzeppelin/contracts": "^2.5.0",
+    "bash": "0.0.1",
     "ganache-cli": "^6.9.1",
-    "truffle": "^5.1.18",
+    "npm-run-all": "^4.1.5",
+    "truffle": "^5.1.21",
     "truffle-assertions": "^0.9.2"
   }
 }
