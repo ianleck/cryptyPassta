@@ -24,7 +24,7 @@ Navigate to cryptyPassta root folder.
 
 1. Run `npm install` to ensure that you have the dependencies required.
 2. Run `npm run start:blockchain`
-3. Run `npm run replace:mac` if you're on Mac
+3. Run `npm run replace:mac` if you're on Mac \n
        `npm run replace:linux` if you're using Linux
    (If you are using Windows, you will have to manually copy the Smart Contract addresses from root folder's `global_address` and `passport_address` to `src/backend/.env`'s `GLOBAL_CONTRACT_ADDRESS` and `PASSPORT_CONTRACT_ADDRESS` respectively)
    
