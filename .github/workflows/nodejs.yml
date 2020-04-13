@@ -5,11 +5,10 @@ name: Node.js CI
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [develop]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -17,15 +16,15 @@ jobs:
         node-version: [10.19.0]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: |
-        npm run build &
-        npm run migrate &
-        npm test
-      env:
-        CI: true
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: |
+          npm run build:contract &
+          npm run migrate &
+          npm test
+        env:
+          CI: true
