@@ -32,7 +32,7 @@ Navigate to cryptyPassta root folder.
    (If you are using Windows, you will have to manually copy the Smart Contract addresses from root folder's `global_address` and `passport_address` to `src/backend/.env`'s `GLOBAL_CONTRACT_ADDRESS` and `PASSPORT_CONTRACT_ADDRESS` respectively)
 4. Run `npm run start:main-app`
    Ensure that `COUNTRY_BLOCKCHAIN_APP=0x9f6682cA19e2D3adbCD5B680f5a24aEc3372Db87` on `.env` before you proceed
-5. Go to http://remix.ethereum.org, import the Passport.abi from root folder.
+5. Go to [Remix](http://remix.ethereum.org), and upload the Passport.abi from root folder.
 6. Open Passport.abi, and change Environment to Web3 Provider and use `localhost:9418`.
 7. Use your passport address to deploy. You can obtain your passport address from `.env` in `src/backend` folder under `PASSPORT_CONTRACT_ADDRESS`.
 8. Click on `setGlobalAddress`, and provide global contract address from `.env` in `src/backend` folder under `GLOBAL_CONTRACT_ADDRESS`.
