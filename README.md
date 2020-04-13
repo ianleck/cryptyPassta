@@ -1,4 +1,4 @@
-# cryptyPassta
+# Crypto Passport!
 
 Crypto passport
 
