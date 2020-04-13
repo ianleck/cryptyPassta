@@ -24,8 +24,10 @@ Navigate to cryptyPassta root folder.
 
 1. Run `npm install` to ensure that you have the dependencies required.
 2. Run `npm run start:blockchain`
-3. Run `npm run replace:mac` if you're on Mac, or `npm run replace:linux` if you're using Linux
+3. Run `npm run replace:mac` if you're on Mac
+       `npm run replace:linux` if you're using Linux
    (If you are using Windows, you will have to manually copy the Smart Contract addresses from root folder's `global_address` and `passport_address` to `src/backend/.env`'s `GLOBAL_CONTRACT_ADDRESS` and `PASSPORT_CONTRACT_ADDRESS` respectively)
+   
 4. Run `npm run start:main-app`
    Ensure that `COUNTRY_BLOCKCHAIN_APP=0x9f6682cA19e2D3adbCD5B680f5a24aEc3372Db87` on `.env` before you proceed
 5. Go to [Remix](http://remix.ethereum.org), and upload the Passport.abi from root folder.
