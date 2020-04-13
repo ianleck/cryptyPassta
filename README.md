@@ -1,6 +1,5 @@
 # Crypto Passport!
 
-Crypto passport
 
 ## About
 
