@@ -16,11 +16,7 @@ You need to have the following.
 
 1. [Node 10.19.0 (or newer)](https://nodejs.org/en/download/)
 2. [Postman](https://www.postman.com/downloads/)
-
-Either option 3 or 4 will suffice depending on your OS for deployment of mobile application
-
-3. [Android Studio](https://developer.android.com/studio) if Windows/Linux/Mac
-4. [XCode] if Mac
+3. [Flutter](https://flutter.dev/docs/get-started/install)
 
 ### Deployment
 
