@@ -45,8 +45,8 @@ Navigate to cryptyPassta root folder.
 10. Go to Postman and POST `localhost:4000/auth/createWorker` with the body
     ```
     { "username": "admin", 
-         "password": "password", 
-         "blockchainAddress" : "0x86be593351645555ece62d4298BD53CacA4Ca58a" 
+      "password": "password", 
+      "blockchainAddress" : "0x86be593351645555ece62d4298BD53CacA4Ca58a" 
     }
     ``` 
 to create admin account on frontend. This account will allow you to login on `localhost:3000` in order to add worker, passport and perform passport travel control.
