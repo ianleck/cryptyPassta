@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/ianleck/cryptyPassta#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^2.5.0",
+    "@openzeppelin/contracts": "^4.4.2",
     "bash": "0.0.1",
     "ganache-cli": "^6.9.1",
     "npm-run-all": "^4.1.5",
